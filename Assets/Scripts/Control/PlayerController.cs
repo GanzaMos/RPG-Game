@@ -1,5 +1,6 @@
 using RPG.Combat;
 using RPG.Movement;
+using RPG.Core;
 using UnityEngine;
 
 namespace RPG.Control
@@ -10,15 +11,19 @@ namespace RPG.Control
         RaycastHit _rayHit;
         Mover _mover;
         Fighter _fighter;
+        Health _health;
 
         void Start()
         {
             _mover = GetComponent<Mover>();
             _fighter = GetComponent<Fighter>();
+            _health = GetComponent<Health>();
         }
 
         void Update()
         {
+            if (_health.isDead) return;
+            
             RayToMousePosition();
             if (InteractWithCombat()) return;
             if (InteractWithMovement()) return;
@@ -40,9 +45,9 @@ namespace RPG.Control
                 Health health = hit.transform.GetComponent<Health>();
                 if (health.isDead) continue;
                 
-                if (Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButton(0))
                 {
-                    _fighter.Attack(combatTarget);
+                    _fighter.Attack(combatTarget.gameObject);
                 }
                 return true;
             }

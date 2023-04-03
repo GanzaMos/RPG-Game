@@ -5,24 +5,28 @@ using UnityEngine.AI;
 
 namespace RPG.Movement
 {
+    [RequireComponent(typeof(ActionScheduler))]
     public class Mover : MonoBehaviour, IAction
     {
         NavMeshAgent _navMeshAgent;
         Animator _animator;
         ActionScheduler _actionScheduler;
+        Health _health;
 
         void Start()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();
             _actionScheduler = GetComponent<ActionScheduler>();
+            _health = GetComponent<Health>();
         }
 
         void Update()
         {
+            _navMeshAgent.enabled = !_health.isDead;
             UpdateAnimator();
         }
-
+        
         public void MoveTo(Vector3 destination)
         {
             _actionScheduler.StartAction(this);

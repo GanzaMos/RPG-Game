@@ -72,6 +72,14 @@ PrefabInstance:
       propertyPath: healthPoint
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 993519999763939723, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: m_Speed
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 5895676224447155872, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: weaponDamage
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 8730126464660787410, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
       propertyPath: m_Name
       value: Enemy
@@ -132,6 +140,20 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 8730126464660787410, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
   m_PrefabInstance: {fileID: 6219185685768985940}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4690288254098499087
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3416366992362540422}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68adaf25bb3d427aa83c9f1932c819d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  chaseDistance: 5
+  maxSuspicionTime: 5
 --- !u!114 &5907811441551628496
 MonoBehaviour:
   m_ObjectHideFlags: 0

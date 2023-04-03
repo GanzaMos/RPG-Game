@@ -64,8 +64,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5895676224447155872, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: weaponDamage
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 8730126464660787410, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
       propertyPath: m_Name
+      value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 8730126464660787410, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: m_TagString
       value: Player
       objectReference: {fileID: 0}
     - target: {fileID: 8730126464660787414, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}

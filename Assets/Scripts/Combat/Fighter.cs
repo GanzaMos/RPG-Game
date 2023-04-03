@@ -7,13 +7,14 @@ using UnityEngine;
 
 namespace RPG.Combat
 {
+    [RequireComponent(typeof(ActionScheduler))]
     public class Fighter : MonoBehaviour, IAction
     {
         [SerializeField] float weaponRange = 2f;
         [SerializeField] float timeBetweenAttacks = 1f;
         [SerializeField] float weaponDamage = 10f;
 
-        float _timeSinceLastAttack = 0f;
+        float _timeSinceLastAttack = Mathf.Infinity;
         
         Mover _mover;
         Transform _targetPosition;
@@ -28,7 +29,7 @@ namespace RPG.Combat
             _animator = GetComponent<Animator>();
         }
 
-        public void Attack(CombatTarget combatTarget)
+        public void Attack(GameObject combatTarget)
         {
             _actionScheduler.StartAction(this);
             _targetPosition = combatTarget.transform;
