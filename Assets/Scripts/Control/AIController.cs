@@ -15,6 +15,8 @@ namespace RPG.Control
         [SerializeField] PatrolPath patrolPath;
         [SerializeField] float waypointTolerance = 1f;
         [SerializeField] float maxDwellingTimeAtWaypoint = 3f;
+        [Range(0,2)]
+        [SerializeField] float calmSpeedFraction = 0.5f;
 
         Transform _player;
         Fighter _fighter;
@@ -52,16 +54,16 @@ namespace RPG.Control
             if (_player == null) return;
             _distanceToPlayer = Vector3.Distance(transform.position, _player.position);
             
-            if (_distanceToPlayer <= chaseDistance)
+            if (_distanceToPlayer <= chaseDistance)                //see the Player? Attack him!
             {
                 _fighter.Attack(_player.gameObject);
                 _timeSinceLastSawPlayer = 0f;
             }
-            else if(maxSuspicionTime >= _timeSinceLastSawPlayer)
+            else if(maxSuspicionTime >= _timeSinceLastSawPlayer)   //Player escaped you? Wait for a while
             {
                 _actionScheduler.CancelCurrentAction();
             }
-            else
+            else                                                   //Waited a bit? Go back to your normal duties
             {
                 PatrolBehavior();
             }
@@ -70,11 +72,11 @@ namespace RPG.Control
 
         void PatrolBehavior()
         {
-            if (patrolPath == null)
+            if (patrolPath == null)                                 //Don't have patrol path? Go back to the starting point
             {
-                _mover.MoveTo(_guardPosition);
+                _mover.MoveTo(_guardPosition, calmSpeedFraction);
             }
-            else
+            else                                                    //Have a patrol path? Go back to patrolling
             {
                 _dwellingTimeAtCurrentWaypoint += Time.deltaTime;
                 
@@ -89,7 +91,7 @@ namespace RPG.Control
                 }
                 else
                 {
-                _mover.MoveTo(GetCurrentWaypointPosition());
+                _mover.MoveTo(GetCurrentWaypointPosition(), calmSpeedFraction);
                 }
             }
         }
