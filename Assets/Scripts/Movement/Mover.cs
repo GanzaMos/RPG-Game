@@ -1,13 +1,15 @@
+using System.Collections.Generic;
 using RPG.Core;
 using RPG.Core.RPG.Core;
 using UnityEngine;
 using UnityEngine.AI;
+using RPG.Saving;
 
 namespace RPG.Movement
 {
     [RequireComponent(typeof(ActionScheduler))]
     [RequireComponent(typeof(NavMeshAgent))]
-    public class Mover : MonoBehaviour, IAction
+    public class Mover : MonoBehaviour, IAction, ISaveable
     {
         [SerializeField] float maxSpeed;
         
@@ -75,6 +77,21 @@ namespace RPG.Movement
             Vector3 localVelocity = transform.InverseTransformDirection(velocity);
             float speed = localVelocity.z;
             _animator.SetFloat("forwardSpeed", speed);
+        }
+
+        public object CaptureState()
+        {
+            Dictionary<string, SerializableVector3> data = new Dictionary<string, SerializableVector3>();
+            data["position"] = new SerializableVector3(transform.position);
+            data["rotation"] = new SerializableVector3(transform.eulerAngles);
+            return data;
+        }
+
+        public void RestoreState(object state)
+        {
+            Dictionary<string, SerializableVector3> data = (Dictionary<string, SerializableVector3>) state;
+            GetComponent<NavMeshAgent>().Warp(data["position"].ToVector());
+            transform.eulerAngles = data["rotation"].ToVector();
         }
     }
 }
