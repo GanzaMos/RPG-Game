@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b883144198b44907b42225cf0c4d27cd, type: 3}
+  m_Name: Small Enemy Bow
+  m_EditorClassIdentifier: 
+  animatorOverrideController: {fileID: 22100000, guid: 5bb417861ba6bfe4b897d8559824df8d, type: 2}
+  weaponPrefab: {fileID: 1563655986059756, guid: 7f105c0c272e6c146b4b41cdc53ea356, type: 3}
+  handType: 0
+  projectile: {fileID: 1258242167371748834, guid: 81aee72bb1d397644b6533c975bef213, type: 3}
+  projectileIsHoming: 0
+  weaponRange: 6
+  timeBetweenAttacks: 2
+  weaponDamage: 5

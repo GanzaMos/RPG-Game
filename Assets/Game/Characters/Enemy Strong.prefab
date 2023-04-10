@@ -11,6 +11,10 @@ PrefabInstance:
       propertyPath: weaponDamage
       value: 8
       objectReference: {fileID: 0}
+    - target: {fileID: 549256790841742324, guid: 4d934cba5bff1fe4fa90972b56f4908b, type: 3}
+      propertyPath: defaultWeapon
+      value: 
+      objectReference: {fileID: 11400000, guid: 0e795bd28055ac54e9b5623128e3c5c4, type: 2}
     - target: {fileID: 693111913030892007, guid: 4d934cba5bff1fe4fa90972b56f4908b, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
@@ -86,6 +90,10 @@ PrefabInstance:
     - target: {fileID: 5931770974373108955, guid: 4d934cba5bff1fe4fa90972b56f4908b, type: 3}
       propertyPath: healthPoint
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 6875693903212961879, guid: 4d934cba5bff1fe4fa90972b56f4908b, type: 3}
+      propertyPath: characterClass
+      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4d934cba5bff1fe4fa90972b56f4908b, type: 3}
