@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using RPG.Attributes;
 using RPG.Core;
 using UnityEngine;
 
@@ -20,6 +21,7 @@ public class Projectile : MonoBehaviour
     Health _health;
     CapsuleCollider _targetCapsuleCollider;
     Vector3 _targetMiddlePoint;
+    GameObject _instigator;
 
     void Update()
     {
@@ -29,9 +31,10 @@ public class Projectile : MonoBehaviour
         if (projectileIsHoming) SetRotation();
     }
     
-    public void SetTarget(Health health)
+    public void SetTarget(Health health, GameObject instigator)
     {
         _health = health;
+        _instigator = instigator;
         _targetCapsuleCollider = _health.transform.GetComponent<CapsuleCollider>();
     }   
     
@@ -48,8 +51,8 @@ public class Projectile : MonoBehaviour
         
         if (otherHealthComponent)
         {
-            print("Arrow has damage " + projectileDamage);
-            otherHealthComponent.TakeDamage(projectileDamage);
+            //print("Arrow has damage " + projectileDamage);
+            otherHealthComponent.ReduceHealth(projectileDamage, _instigator);
         }
 
         if (hitEffect != null)

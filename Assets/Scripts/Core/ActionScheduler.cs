@@ -2,9 +2,7 @@
 
 namespace RPG.Core
 {
-    namespace RPG.Core
-    {
-        public class ActionScheduler : MonoBehaviour
+    public class ActionScheduler : MonoBehaviour
         {
             IAction _currentAction;
             
@@ -20,8 +18,7 @@ namespace RPG.Core
 
             public void CancelCurrentAction()
             {
-                _currentAction.Cancel();
+                _currentAction?.Cancel();
             }
         }
-    }
 }

@@ -6,8 +6,8 @@
         Fighter,
         Barbarian,
         Thief,
-        Guard,
-        Archer,
+        EnemyGuard,
+        EnemyArcher,
         Mage
     }
 }

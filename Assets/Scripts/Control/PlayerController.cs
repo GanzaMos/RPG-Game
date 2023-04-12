@@ -1,6 +1,7 @@
 using RPG.Combat;
 using RPG.Movement;
 using RPG.Core;
+using RPG.Attributes;
 using UnityEngine;
 
 namespace RPG.Control
@@ -22,7 +23,7 @@ namespace RPG.Control
 
         void Update()
         {
-            if (_health.isDead) return;
+            if (_health.IsDead) return;
             
             RayToMousePosition();
             if (InteractWithCombat()) return;
@@ -43,7 +44,7 @@ namespace RPG.Control
                 if (combatTarget == null) continue;
                 
                 Health health = hit.transform.GetComponent<Health>();
-                if (health.isDead) continue;
+                if (health.IsDead) continue;
                 
                 if (Input.GetMouseButton(0))
                 {

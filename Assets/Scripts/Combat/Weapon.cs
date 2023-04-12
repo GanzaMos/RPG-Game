@@ -1,6 +1,5 @@
 ﻿using RPG.Core;
-using Unity.VisualScripting;
-using Unity.VisualScripting.FullSerializer;
+using RPG.Attributes;
 using UnityEngine;
 using UnityEngine.XR;
 
@@ -63,10 +62,10 @@ namespace RPG.Combat
             return projectile;
         }
 
-        public void LaunchProjectile(Transform rightHandTransform, Transform leftHandTransform, Health health)
+        public void LaunchProjectile(Transform rightHandTransform, Transform leftHandTransform, Health health, GameObject instigator)
         {
             Projectile projectileInstance = projectileInstance = Instantiate(projectile, leftHandTransform.position, Quaternion.identity);
-            projectileInstance.SetTarget(health);
+            projectileInstance.SetTarget(health, instigator);
             projectileInstance.SetRotation();
             projectileInstance.projectileDamage = weaponDamage;
             projectileInstance.projectileIsHoming = projectileIsHoming;

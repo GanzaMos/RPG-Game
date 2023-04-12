@@ -1,9 +1,8 @@
 ﻿using System;
 using RPG.Core;
-using RPG.Core.RPG.Core;
+using RPG.Attributes;
 using RPG.Movement;
 using RPG.Saving;
-using Unity.VisualScripting;
 using UnityEngine;
 
 namespace RPG.Combat
@@ -73,7 +72,7 @@ namespace RPG.Combat
         void AttackBehavior()
         {
             transform.LookAt(_targetPosition);
-            if (_timeSinceLastAttack >= currentWeapon.TimeBetweenAttacks && !_targetHealth.isDead)
+            if (_timeSinceLastAttack >= currentWeapon.TimeBetweenAttacks && !_targetHealth.IsDead)
             {
                 //this will trigger animation Hit() effect
                 _animator.ResetTrigger("stopAttacking");
@@ -86,16 +85,17 @@ namespace RPG.Combat
         void Hit()
         {
             if (_targetHealth == null) return;
-            _targetHealth.TakeDamage(currentWeapon.WeaponDamage);
+            _targetHealth.ReduceHealth(currentWeapon.WeaponDamage, gameObject);
         }
         
+        //animation effect
         void Shoot()
         {
             if (_targetHealth == null) return;
             
             if (currentWeapon.HasProjectile())
             {
-                currentWeapon.LaunchProjectile(rightHandTransform, leftHandTransform, _targetHealth);
+                currentWeapon.LaunchProjectile(rightHandTransform, leftHandTransform, _targetHealth, gameObject);
             }
             
         }

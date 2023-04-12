@@ -1,9 +1,8 @@
 ﻿using System;
 using RPG.Combat;
 using RPG.Core;
-using RPG.Core.RPG.Core;
 using RPG.Movement;
-using Unity.VisualScripting;
+using RPG.Attributes;
 using UnityEngine;
 
 namespace RPG.Control
@@ -44,7 +43,7 @@ namespace RPG.Control
 
         void Update()
         {
-            if (_health.isDead) return;
+            if (_health.IsDead) return;
             
             ChasingCheck();
         }
