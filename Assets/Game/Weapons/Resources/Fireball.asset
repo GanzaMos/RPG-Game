@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   animatorOverrideController: {fileID: 22100000, guid: 9d0514ef10eacc24180de8f34627c48b, type: 2}
   weaponPrefab: {fileID: 1563655986059756, guid: 910848f83959a8f4182630e4bb73be26, type: 3}
-  handType: 1
-  projectile: {fileID: 2541318175661592533, guid: 0649be82d2ba67d42bc5e0c9229162b7, type: 3}
+  weaponHand: 1
+  projectilePrefab: {fileID: 2541318175661592533, guid: 0649be82d2ba67d42bc5e0c9229162b7, type: 3}
   projectileIsHoming: 1
   weaponRange: 20
   timeBetweenAttacks: 4

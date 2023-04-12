@@ -10,13 +10,16 @@ namespace RPG.Combat
     [RequireComponent(typeof(ActionScheduler))]
     public class Fighter : MonoBehaviour, IAction, ISaveable
     {
+        //Serializable
         [SerializeField] Transform rightHandTransform = null;
         [SerializeField] Transform leftHandTransform = null;
         [SerializeField] Weapon defaultWeapon = null;
         [SerializeField] Weapon currentWeapon = null;
 
+        //local variables
         float _timeSinceLastAttack = Mathf.Infinity;
         
+        //Cashed
         GameObject _currentWeaponPrefab;
         Mover _mover;
         ActionScheduler _actionScheduler;
@@ -24,16 +27,23 @@ namespace RPG.Combat
         Transform _targetPosition;
         Health _targetHealth;
         
+        
+        //Starting setup
+        
         void Start()
         {
-            _mover = GetComponent<Mover>();
-            _actionScheduler = GetComponent<ActionScheduler>();
-            _animator = GetComponent<Animator>();
-            if (currentWeapon == null)
+            _mover = GetComponent<Mover>()                     ?? throw new Exception($"Missing Mover for Fighter in {gameObject.name}!");
+            _actionScheduler = GetComponent<ActionScheduler>() ?? throw new Exception($"Missing ActionScheduler for Fighter in {gameObject.name}!");
+            _animator = GetComponent<Animator>()               ?? throw new Exception($"Missing Animator for Fighter in {gameObject.name}!");
+            
+            if (!currentWeapon)
             {
                 EquipWeapon(defaultWeapon);
             }
         }
+        
+        
+        //Main methods for attacking
         
         void Update()
         {
@@ -52,21 +62,9 @@ namespace RPG.Combat
             }
         }
 
-        public void EquipWeapon(Weapon weapon)
+        bool IsNear()
         {
-            if (weapon == null) return;
-            if (weapon == currentWeapon) return;
-            if (_currentWeaponPrefab != null) Destroy(_currentWeaponPrefab);
-            
-            currentWeapon = weapon;
-            _currentWeaponPrefab = weapon.Spawn(rightHandTransform, leftHandTransform, _animator);
-        }
-
-        public void Attack(GameObject combatTarget)
-        {
-            _actionScheduler.StartAction(this);
-            _targetPosition = combatTarget.transform;
-            _targetHealth = _targetPosition.GetComponent<Health>();
+            return Vector3.Distance(transform.position, _targetPosition.position) <= currentWeapon.WeaponRange;
         }
 
         void AttackBehavior()
@@ -74,32 +72,55 @@ namespace RPG.Combat
             transform.LookAt(_targetPosition);
             if (_timeSinceLastAttack >= currentWeapon.TimeBetweenAttacks && !_targetHealth.IsDead)
             {
-                //this will trigger animation Hit() effect
+                //this will trigger animation Hit() or Shoot() effect
                 _animator.ResetTrigger("stopAttacking");
                 _animator.SetTrigger("attack");
                 _timeSinceLastAttack = 0f;
             }
         }
-
-        //animation effect
-        void Hit()
+        
+        void Hit()   //animation called method
         {
             if (_targetHealth == null) return;
             _targetHealth.ReduceHealth(currentWeapon.WeaponDamage, gameObject);
         }
         
-        //animation effect
-        void Shoot()
+        void Shoot()  //animation called method
         {
             if (_targetHealth == null) return;
             
-            if (currentWeapon.HasProjectile())
+            if (currentWeapon.ProjectilePrefab)
             {
                 currentWeapon.LaunchProjectile(rightHandTransform, leftHandTransform, _targetHealth, gameObject);
             }
-            
+        }
+        
+        
+        //Set target for attack 
+        
+        public void SetTarget(GameObject combatTarget)
+        {
+            _actionScheduler.StartAction(this);
+            _targetPosition = combatTarget.transform;
+            _targetHealth = _targetPosition.GetComponent<Health>();
         }
 
+        
+        //Equipping weapon from Serialized field 
+        
+        public void EquipWeapon(Weapon weapon)
+        {
+            if (weapon == null) return;
+            if (weapon == currentWeapon) return;
+            if (_currentWeaponPrefab) Destroy(_currentWeaponPrefab);
+            
+            currentWeapon = weapon;
+            _currentWeaponPrefab = weapon.Spawn(rightHandTransform, leftHandTransform, _animator);
+        }
+        
+
+        //IAction interface method for correct work with Mover
+        
         public void Cancel()
         {
             _targetPosition = null;
@@ -109,22 +130,12 @@ namespace RPG.Combat
         }
 
 
-        bool IsNear()
-        {
-            return Vector3.Distance(transform.position, _targetPosition.position) <= currentWeapon.WeaponRange;
-        }
+        //Saving system methods
 
         public object CaptureState()
         {
-            if (currentWeapon != null)
-            {
-                return currentWeapon.name;
-            }
-            else
-            {
-                return defaultWeapon.name;
-            }
-
+            if (currentWeapon) return currentWeapon.name;
+            else return defaultWeapon.name;
         }
 
         public void RestoreState(object state)

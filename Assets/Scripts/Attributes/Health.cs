@@ -9,117 +9,113 @@ namespace RPG.Attributes
     [System.Serializable]
     public class Health : MonoBehaviour, ISaveable
     {
-        [SerializeField] float maxHealthPoint = 99f;
-        public float MaxHealthPoint => maxHealthPoint;
+        //Serializable
+        [SerializeField] float maxHealthPoints = 99f;
+        public float MaxHealthPoints => maxHealthPoints;
 
-        [SerializeField] float currentHealthPoint;
-        public float CurrentHealthPoint => currentHealthPoint;
+        [SerializeField] float currentHealthPoints;
+        public float CurrentHealthPoints => currentHealthPoints;
         
+        
+        //Cashed
         bool _isDead;
         public bool IsDead => _isDead;
+        Animator _animator;
+        BaseStats _baseStats;
+        ActionScheduler _actionScheduler;
+        CapsuleCollider _capsuleCollider;
 
-        GameObject _instigator = null;
-        public GameObject Instigator
-        {
-            get => _instigator;
-            set => _instigator = value;
-        }
-
+       
+        //Starting setup
+        
         void Start()
         {
-            if (GetComponent<BaseStats>() == null) print("Can't find BaseStats component for Health!");
-            else
-            {
-                float currentLevelHealth = GetComponent<BaseStats>().GetStat(Stat.Health);
+            _baseStats = GetComponent<BaseStats>() ?? throw new Exception($"Missing BaseStat for Health in {gameObject.name}!");
+            if (_baseStats != null) 
+            { 
+                float currentLevelHealth = _baseStats.GetStat(Stat.Health);
                 SetMaxHealth(currentLevelHealth);
                 SetCurrentHealth(currentLevelHealth);
             }
+
+            _animator = GetComponent<Animator>()               ?? throw new Exception($"Missing Animator for Health in {gameObject.name}!");
+            _actionScheduler = GetComponent<ActionScheduler>() ?? throw new Exception($"Missing ActionScheduler for Health in {gameObject.name}!");
+            _capsuleCollider = GetComponent<CapsuleCollider>() ?? throw new Exception($"Missing CapsuleCollider for Health in {gameObject.name}!");
+            _baseStats = GetComponent<BaseStats>()             ?? throw new Exception($"Missing BaseStats for Health in in {gameObject.name}");
         }
+
         
         //Public methods to operate health amount
-        
+
         public void ReduceHealth(float healthAmountToReduce, GameObject instigator = null)
         {
             if (_isDead) return;
             
-            print(transform.name + " health = " + currentHealthPoint);
-            currentHealthPoint = Mathf.Max(currentHealthPoint - healthAmountToReduce, 0);
+            print(transform.name + " health = " + currentHealthPoints);
+            currentHealthPoints = Mathf.Max(currentHealthPoints - healthAmountToReduce, 0);
             
-            if (currentHealthPoint <= 0)
+            if (currentHealthPoints <= 0)
             {
                 ExperienceAward(instigator);
                 Die();
             }
         }
 
-        public void RestoreHealth(float healthAmountToRestore)
+        public void RestoreHealth(float healthPointsToRestore)
         {
-            currentHealthPoint = Mathf.Min(currentHealthPoint + healthAmountToRestore, maxHealthPoint);
+            currentHealthPoints = Mathf.Min(currentHealthPoints + healthPointsToRestore, maxHealthPoints);
         }
 
-        public void SetCurrentHealth(float currentHealthPoint)
+        public void SetCurrentHealth(float healthPointsToSet)
         {
-            this.currentHealthPoint = Mathf.Min(currentHealthPoint, maxHealthPoint);
-            if (this.currentHealthPoint <= 0) Die();
+            currentHealthPoints = Mathf.Min(healthPointsToSet, maxHealthPoints);
+            if (currentHealthPoints <= 0) Die();
         }
 
-        public void SetMaxHealth(float maxHealthPoint)
+        public void SetMaxHealth(float maxHealthPoints)
         {
-            this.maxHealthPoint = maxHealthPoint;
+            this.maxHealthPoints = maxHealthPoints;
         }
 
 
         //Private methods
-
+        
         void ExperienceAward(GameObject instigator)
         {
-            float expPerKill;
+            float expPerKill = _baseStats.GetStat(Stat.ExperiencePointPerKill);
 
-            BaseStats baseStats = GetComponent<BaseStats>();
-            if (baseStats)
+            Experience instigatorExperience;
+            instigatorExperience = instigator.GetComponent<Experience>();
+            if (!instigatorExperience)
             {
-                expPerKill = GetComponent<BaseStats>().GetStat(Stat.ExperiencePointPerKill);
-            }
-            else
-            {
-                print($"Can't find BaseStat in {gameObject.name} to take Exp cost");
+                print($"Missing instigators Experience in {instigator.gameObject.name} to give its ExpCost to ({gameObject.name})");
                 return;
             }
-
-            Experience instigatorExperience = instigator.GetComponent<Experience>();
-            if (instigatorExperience)
-            {
-                instigatorExperience.GetComponent<Experience>().GetExperience(expPerKill);
-            }
-            else
-            {
-                print($"Can't find Experience Component in instigator ({gameObject.name}) to give it Exp cost");
-                return;
-            }
+            instigatorExperience.GetComponent<Experience>().GetExperience(expPerKill);
         }
 
         void Die(string deathTriggerName = "death")
         {
             _isDead = true;
-            GetComponent<Animator>().SetTrigger(deathTriggerName);
-            GetComponent<ActionScheduler>().CancelCurrentAction();
-            GetComponent<CapsuleCollider>().enabled = false;
+            _animator.SetTrigger(deathTriggerName);
+            _actionScheduler.CancelCurrentAction();
+            _capsuleCollider.enabled = false;
         }
         
         
-        //Saving system components
+        //Saving system methods
         
         public object CaptureState()
         {
-            return currentHealthPoint;
+            return currentHealthPoints;
         }
         
         public void RestoreState(object state)
         {
             float savedHealthPoint = (float) state;
-            currentHealthPoint = savedHealthPoint;
+            currentHealthPoints = savedHealthPoint;
 
-            if (currentHealthPoint <= 0) Die("loadSave");
+            if (currentHealthPoints <= 0) Die("loadSave");
             else _isDead = false;
         }
     }

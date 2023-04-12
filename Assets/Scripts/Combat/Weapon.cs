@@ -1,4 +1,5 @@
-﻿using RPG.Core;
+﻿using System;
+using RPG.Core;
 using RPG.Attributes;
 using UnityEngine;
 using UnityEngine.XR;
@@ -9,72 +10,54 @@ namespace RPG.Combat
     public class Weapon : ScriptableObject
 
     {
+        //Serializable
         [SerializeField] AnimatorOverrideController animatorOverrideController = null;
         
         [SerializeField] GameObject weaponPrefab = null;
-        [SerializeField] HandType handType = HandType.RightHand;
+        [SerializeField] WeaponHand weaponHand = WeaponHand.RightHand;
         
-        [SerializeField] Projectile projectile = null;
+        [SerializeField] Projectile projectilePrefab = null;
+        public Projectile ProjectilePrefab => projectilePrefab;
+        
         [SerializeField] bool projectileIsHoming = false;
+        public bool ProjectileIsHoming => projectileIsHoming;
         
         [SerializeField] float weaponRange = 2f;
         public float WeaponRange => weaponRange;
-        
+
         [SerializeField] float timeBetweenAttacks = 1f;
         public float TimeBetweenAttacks => timeBetweenAttacks;
         
         [SerializeField] float weaponDamage = 10f;
         public float WeaponDamage => weaponDamage;
-
+        
+        
+        //Spawning Weapon SO instance
         
         public GameObject Spawn(Transform rightHandTransform,Transform leftHandTransform, Animator animator)
         {
-            // AnimatorOverrideController overrideController;
-            //
-            // if (animatorOverrideController != null)
-            // {
-            //     overrideController = animator.runtimeAnimatorController as AnimatorOverrideController;
-            //     animator.runtimeAnimatorController = animatorOverrideController; 
-            // }
-            // else if (overrideController != null)
-            // {
-            //     animator.runtimeAnimatorController = overrideController.runtimeAnimatorController;
-            // }
-            
-            if (animator != null)
+            animator.runtimeAnimatorController = animatorOverrideController ?? throw new Exception($"Missing default character Animator from {animator.gameObject.name} for Weapon spawn!");
+
+            if (weaponPrefab)
             {
-                animator.runtimeAnimatorController = animatorOverrideController;
-            }
-            
-            if (weaponPrefab != null)
-            {
-                switch (handType)
+                switch (weaponHand)
                 {
-                    case HandType.RightHand: return Instantiate(weaponPrefab, rightHandTransform);
-                    case HandType.LeftHand:  return Instantiate(weaponPrefab, leftHandTransform);
+                    case WeaponHand.RightHand: return Instantiate(weaponPrefab, rightHandTransform);
+                    case WeaponHand.LeftHand:  return Instantiate(weaponPrefab, leftHandTransform);
                 }
             }
             return null;
         }
 
-        public bool HasProjectile()
-        {
-            return projectile;
-        }
-
+        
+        //Spawning Weapon projectiles when attacking
+        
         public void LaunchProjectile(Transform rightHandTransform, Transform leftHandTransform, Health health, GameObject instigator)
         {
-            Projectile projectileInstance = projectileInstance = Instantiate(projectile, leftHandTransform.position, Quaternion.identity);
+            Projectile projectileInstance = projectileInstance = Instantiate(projectilePrefab, leftHandTransform.position, Quaternion.identity);
             projectileInstance.SetTarget(health, instigator);
-            projectileInstance.SetRotation();
-            projectileInstance.projectileDamage = weaponDamage;
-            projectileInstance.projectileIsHoming = projectileIsHoming;
-        }
-
-        enum HandType
-        {
-            LeftHand,
-            RightHand
+            projectileInstance.ProjectileDamage = weaponDamage;
+            projectileInstance.ProjectileIsHoming = projectileIsHoming;
         }
     }
 }

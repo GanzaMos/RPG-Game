@@ -5,14 +5,15 @@ namespace RPG.Attributes
 {
     public class Experience : MonoBehaviour, ISaveable
     {
-        [SerializeField] float currentExperience = 0f;
+        [SerializeField] float currentExperiencePoints = 0f;
+        public float CurrentExperiencePoints => currentExperiencePoints;
 
         
         //Main Methods
         
         public void GetExperience(float experienceAmount)
         {
-            currentExperience += experienceAmount;
+            currentExperiencePoints += experienceAmount;
         }
 
         
@@ -20,12 +21,12 @@ namespace RPG.Attributes
         
         public object CaptureState()
         {
-            return currentExperience;
+            return currentExperiencePoints;
         }
 
         public void RestoreState(object state)
         {
-            currentExperience = (float) state;
+            currentExperiencePoints = (float) state;
         }
     }
 }

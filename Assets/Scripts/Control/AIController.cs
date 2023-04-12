@@ -9,6 +9,7 @@ namespace RPG.Control
 {
     public class AIController : MonoBehaviour
     {
+        //Serialized
         [SerializeField] float chaseDistance = 5f;
         [SerializeField] float maxSuspicionTime = 3f;
         [SerializeField] PatrolPath patrolPath;
@@ -16,13 +17,15 @@ namespace RPG.Control
         [SerializeField] float maxDwellingTimeAtWaypoint = 3f;
         [Range(0,2)]
         [SerializeField] float calmSpeedFraction = 0.5f;
-
+        
+        //Cashed
         Transform _player;
         Fighter _fighter;
         Mover _mover;
         Health _health;
         ActionScheduler _actionScheduler;
         
+        //Local variables
         float _distanceToPlayer;
         Vector3 _guardPosition;
         float _timeSinceLastSawPlayer = Mathf.Infinity;
@@ -30,6 +33,7 @@ namespace RPG.Control
         int _currentWaypointIndex = 0;
         
         
+        //Starting setup
         
         void Start()
         {
@@ -41,6 +45,9 @@ namespace RPG.Control
             _guardPosition = transform.position;
         }
 
+        
+        //Main AI behavior sequence
+        
         void Update()
         {
             if (_health.IsDead) return;
@@ -55,7 +62,7 @@ namespace RPG.Control
             
             if (_distanceToPlayer <= chaseDistance)                //see the Player? Attack him!
             {
-                _fighter.Attack(_player.gameObject);
+                _fighter.SetTarget(_player.gameObject);
                 _timeSinceLastSawPlayer = 0f;
             }
             else if(maxSuspicionTime >= _timeSinceLastSawPlayer)   //Player escaped you? Wait for a while
@@ -71,7 +78,7 @@ namespace RPG.Control
 
         void PatrolBehavior()
         {
-            if (patrolPath == null)                                 //Don't have patrol path? Go back to the starting point
+            if (!patrolPath)                                 //Don't have patrol path? Go back to the starting point
             {
                 _mover.MoveTo(_guardPosition, calmSpeedFraction);
             }
@@ -96,6 +103,8 @@ namespace RPG.Control
         }
 
 
+        //Waypoints processing
+        
         bool AtWaypoint()
         {
             float distanceToWaypoint = Vector3.Distance(transform.position, GetCurrentWaypointPosition());
@@ -119,6 +128,9 @@ namespace RPG.Control
             return patrolPath.GetWaypointPosition(_currentWaypointIndex);
         }
 
+        
+        //Draw a sphere of a chasing radius
+        
         void OnDrawGizmosSelected()
         {
             Gizmos.color = Color.white;

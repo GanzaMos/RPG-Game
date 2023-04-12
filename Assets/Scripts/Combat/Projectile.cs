@@ -7,55 +7,66 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
-
+    //Serializable
     [SerializeField] Transform target;
     [SerializeField] float speed = 20f;
     [SerializeField] GameObject hitEffect = null;
-    
     [SerializeField] GameObject[] objectsToDestroyInstantly;
     [SerializeField] float timeToDestroyAllProjectile;
 
-    public float projectileDamage;
-    public bool projectileIsHoming;
+    //Public variables
+    float _projectileDamage;
+    public float ProjectileDamage
+    {
+        get => _projectileDamage;
+        set => _projectileDamage = value;
+    }
+    
+    bool _projectileIsHoming;
+    public bool ProjectileIsHoming
+    {
+        get => _projectileIsHoming;
+        set => _projectileIsHoming = value;
+    }
 
+    //Cashed
     Health _health;
     CapsuleCollider _targetCapsuleCollider;
     Vector3 _targetMiddlePoint;
     GameObject _instigator;
 
+    
+    //Main work methods
+    
     void Update()
     {
         if (_health == null) return;
         transform.Translate(speed * Time.deltaTime * Vector3.forward);
 
-        if (projectileIsHoming) SetRotation();
+        if (_projectileIsHoming) SetRotation();
     }
     
-    public void SetTarget(Health health, GameObject instigator)
-    {
-        _health = health;
-        _instigator = instigator;
-        _targetCapsuleCollider = _health.transform.GetComponent<CapsuleCollider>();
-    }   
-    
-    public void SetRotation()
+    void SetRotation()
     {
         _targetMiddlePoint = _health.transform.position + Vector3.up * (_targetCapsuleCollider.height / 3 * 2);
         transform.LookAt(_targetMiddlePoint);
     }
     
-    
     void OnTriggerEnter(Collider other)
     {
-        Health otherHealthComponent = other.GetComponent<Health>();
-        
-        if (otherHealthComponent)
+        Health targetHealth = other.GetComponent<Health>();
+        if (!targetHealth)
         {
-            //print("Arrow has damage " + projectileDamage);
-            otherHealthComponent.ReduceHealth(projectileDamage, _instigator);
+            print($"Missing target Health for {gameObject.name} Projectile!");
+            return;
+        }
+        
+        if (targetHealth)
+        {
+            targetHealth.ReduceHealth(_projectileDamage, _instigator);
         }
 
-        if (hitEffect != null)
+        if (hitEffect)
         {
             Instantiate(hitEffect, _targetMiddlePoint, Quaternion.identity);
         }
@@ -67,4 +78,16 @@ public class Projectile : MonoBehaviour
         
         Destroy(gameObject, timeToDestroyAllProjectile);
     }
+    
+    
+    //Public methods for setup Projectile instance
+    
+    public void SetTarget(Health health, GameObject instigator)
+    {
+        _health = health;
+        _instigator = instigator;
+        _targetCapsuleCollider = _health.transform.GetComponent<CapsuleCollider>() ?? throw new Exception($"Missing CapsuleCollider for Projectile in {gameObject.name}!");
+        SetRotation();
+    }
+
 }

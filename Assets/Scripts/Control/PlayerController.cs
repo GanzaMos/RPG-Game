@@ -1,3 +1,4 @@
+using System;
 using RPG.Combat;
 using RPG.Movement;
 using RPG.Core;
@@ -8,17 +9,23 @@ namespace RPG.Control
 {
     public class PlayerController : MonoBehaviour
     {
-        Ray _mousePositionRay;
-        RaycastHit _rayHit;
+        //Cashed
         Mover _mover;
         Fighter _fighter;
         Health _health;
+        
+        //Local variables
+        Ray _mousePositionRay;
+        RaycastHit _rayHit;
 
+        
+        //Starting setup
+        
         void Start()
         {
-            _mover = GetComponent<Mover>();
-            _fighter = GetComponent<Fighter>();
-            _health = GetComponent<Health>();
+            _mover = GetComponent<Mover>()       ?? throw new Exception($"Missing Mover for PlayerController in {gameObject.name}");
+            _fighter = GetComponent<Fighter>()   ?? throw new Exception($"Missing Fighter for PlayerController in {gameObject.name}");
+            _health = GetComponent<Health>()     ?? throw new Exception($"Missing Health for PlayerController in {gameObject.name}");
         }
 
         void Update()
@@ -41,14 +48,14 @@ namespace RPG.Control
             foreach (RaycastHit hit in hits)
             {
                 CombatTarget combatTarget = hit.transform.GetComponent<CombatTarget>();
-                if (combatTarget == null) continue;
+                if (!combatTarget) continue;
                 
                 Health health = hit.transform.GetComponent<Health>();
                 if (health.IsDead) continue;
                 
                 if (Input.GetMouseButton(0))
                 {
-                    _fighter.Attack(combatTarget.gameObject);
+                    _fighter.SetTarget(combatTarget.gameObject);
                 }
                 return true;
             }
