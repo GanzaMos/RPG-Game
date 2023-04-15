@@ -134,6 +134,14 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 296989273684377999, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: maxHealthPoints
+      value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 296989273684377999, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: currentHealthPoints
+      value: 50
+      objectReference: {fileID: 0}
     - target: {fileID: 659112429529578755, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
       propertyPath: characterClass
       value: 1
@@ -174,6 +182,10 @@ PrefabInstance:
       propertyPath: leftHandTransform
       value: 
       objectReference: {fileID: 4627337022344449546}
+    - target: {fileID: 5895676224447155872, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: weaponDamageBonus
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5895676224447155872, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
       propertyPath: rightHandTransform
       value: 
@@ -246,18 +258,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8730126464660787414, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
   m_PrefabInstance: {fileID: 8172858017241863339}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7097700048988900814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 597976903536624761}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 34706b30340da7d4492ffdd8b1964513, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &6530997192224771778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -270,4 +270,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec633ebeb2964120a0dfe9e618674324, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentExperience: 0
+  currentExperiencePoints: 0
+--- !u!114 &7097700048988900814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 597976903536624761}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 34706b30340da7d4492ffdd8b1964513, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cursorMappings:
+  - cursorType: 0
+    cursorTexture2D: {fileID: 2800000, guid: 21628736160fcc9488493401da3ef621, type: 3}
+    cursorHotspot: {x: 0, y: 0}
+  - cursorType: 1
+    cursorTexture2D: {fileID: 2800000, guid: 44a99ee545fd8ba46a452b12c1f9378b, type: 3}
+    cursorHotspot: {x: 0, y: 0}
+  - cursorType: 2
+    cursorTexture2D: {fileID: 2800000, guid: 2d18e23e3ce249b4489b8bcdd02d3f48, type: 3}
+    cursorHotspot: {x: 0, y: 0}

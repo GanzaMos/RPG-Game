@@ -1,5 +1,6 @@
 ﻿using System;
 using RPG.Combat;
+using RPG.Stats;
 using TMPro;
 using UnityEngine;
 using UnityEngine.PlayerLoop;
@@ -11,41 +12,43 @@ namespace RPG.Attributes
         //Serializable
         [SerializeField] TMP_Text healthValue;
         [SerializeField] TMP_Text experienceValue;
+        [SerializeField] TMP_Text levelValue;
         
-        //Cashed
-        GameObject _player;
-        Health _health;
-        Experience _experience;
-        
-        
-        //Setup methods
-        
-        void Awake()
+
+        //event subscription
+
+        void OnEnable()
         {
-            _player = GameObject.FindGameObjectWithTag("Player") ?? throw new Exception($"Missing Player GO for {gameObject.name}!");
-            _health = _player.GetComponent<Health>()             ?? throw new Exception($"Missing Health component for {gameObject.name}!");
-            _experience = _player.GetComponent<Experience>()     ?? throw new Exception($"Missing Experience component for {gameObject.name}!");
+            EventBus.OnHealthUpdated += SetHealthValueDisplay;
+            EventBus.OnExpUpdated += SetExperienceValueDisplay;
+            EventBus.OnLevelUpdated += SetLevelValueDisplay;
+        }
+
+        void OnDisable()
+        {
+            EventBus.OnHealthUpdated -= SetHealthValueDisplay;
+            EventBus.OnExpUpdated -= SetExperienceValueDisplay;
+            EventBus.OnLevelUpdated -= SetLevelValueDisplay;
         }
 
 
         //Main methods
-
-        void Update()
+        void SetHealthValueDisplay(float currentHealthPoints, float maxHealthPoints)
         {
-            SetHealthValueDisplay();
-            SetExperienceValueDisplay();
+            if (healthValue == null) print("Can't find TMP component for StatDisplay.cs to display players health!");
+            else healthValue.text = $"{currentHealthPoints} / {maxHealthPoints}";
         }
         
-        void SetHealthValueDisplay()
-        {
-            if (healthValue == null)     print("Can't find TMP component for StatDisplay.cs to display players health!");
-            else healthValue.text = (_health.CurrentHealthPoints / _health.MaxHealthPoints).ToString("P0");
-        }
-        
-        void SetExperienceValueDisplay()
+        void SetExperienceValueDisplay(float experience)
         {
             if (experienceValue == null) print("Can't find TMP component for StatDisplay.cs to display players experience!");
-            else experienceValue.text = _experience.CurrentExperiencePoints.ToString();
+            else experienceValue.text = experience.ToString();
+        }        
+        
+        void SetLevelValueDisplay(float currentLevel)
+        {
+            if (levelValue == null) print("Can't find TMP component for StatDisplay.cs to display players experience!");
+            else levelValue.text = currentLevel.ToString();
         }
         
     }

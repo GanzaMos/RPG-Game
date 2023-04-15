@@ -42,7 +42,7 @@ namespace RPG.Saving
         }
 
 #if UNITY_EDITOR
-        private void Update() {
+        void Update() {
             if (Application.IsPlaying(gameObject)) return;
             if (string.IsNullOrEmpty(gameObject.scene.path)) return;
 
@@ -59,7 +59,7 @@ namespace RPG.Saving
         }
 #endif
 
-        private bool IsUnique(string candidate)
+        bool IsUnique(string candidate)
         {
             if (!globalLookup.ContainsKey(candidate)) return true;
 

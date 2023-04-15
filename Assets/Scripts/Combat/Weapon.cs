@@ -52,11 +52,11 @@ namespace RPG.Combat
         
         //Spawning Weapon projectiles when attacking
         
-        public void LaunchProjectile(Transform rightHandTransform, Transform leftHandTransform, Health health, GameObject instigator)
+        public void LaunchProjectile(Transform rightHandTransform, Transform leftHandTransform, Health health, GameObject instigator, float damage)
         {
             Projectile projectileInstance = projectileInstance = Instantiate(projectilePrefab, leftHandTransform.position, Quaternion.identity);
             projectileInstance.SetTarget(health, instigator);
-            projectileInstance.ProjectileDamage = weaponDamage;
+            projectileInstance.ProjectileDamage = damage;
             projectileInstance.ProjectileIsHoming = projectileIsHoming;
         }
     }

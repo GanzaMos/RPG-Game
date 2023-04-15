@@ -20,7 +20,7 @@ namespace RPG.Movement
 
         float _speedFraction;
 
-        void Start()
+        void Awake()
         {
             _navMeshAgent = GetComponent<NavMeshAgent>();
             _animator = GetComponent<Animator>();

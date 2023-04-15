@@ -19,4 +19,4 @@ MonoBehaviour:
   projectileIsHoming: 1
   weaponRange: 20
   timeBetweenAttacks: 4
-  weaponDamage: 20
+  weaponDamage: 15

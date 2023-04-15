@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -18,7 +19,7 @@ namespace RPG.Stats
             public CharacterClass characterClass;
             public ProgressionStat[] progressionStats;
         }
-        
+
         //Layer 3, what is it the exact Stat and how many levels it has?
         [System.Serializable]
         class ProgressionStat
@@ -26,38 +27,48 @@ namespace RPG.Stats
             public Stat stat;
             public float[] levels;
         }
-        
-        
-        //Start looking for a acquired Character Class in Character Class Progression array from Layer 1
+
+        Dictionary<CharacterClass, Dictionary<Stat, float[]>> _lookupTable;   //So, we need a Matroshka dictionary for a quick look up
+
         
         public float GetStat(CharacterClass characterClass, int currentLevel, Stat stat)
         {
-            foreach (CharacterClassProgression charClassProgression in characterClassesProgressions)
+            BuildOurDictionary();
+            float[] levels = _lookupTable[characterClass][stat];
+            if (levels.Length < currentLevel)
             {
-                if (charClassProgression.characterClass != characterClass) continue;     //go to the next element if current doesn't match
-                
-                return LookingForAcquiredStat(currentLevel, stat, charClassProgression); //go to the Layer 2
+                Debug.Log($"Level array size in Dictionary is {levels.Length}. Level {currentLevel} is acquired");
+                return 0f;
             }
-            Debug.Log($"Can't find acquired {characterClass} class in Progression SO");
-            return 11.3f;
+
+            return levels[currentLevel - 1];
         }
         
-        
-        //Start looking for a acquired Stat in Character Class Stat array from Layer 2
 
-        float LookingForAcquiredStat(int currentLevel, Stat stat, CharacterClassProgression charClassProgression)
+        void BuildOurDictionary()
         {
-            foreach (ProgressionStat progressionStat in charClassProgression.progressionStats)
+            if (_lookupTable != null) return; //we only need to build Dictionary once!
+
+            _lookupTable =
+                new Dictionary<CharacterClass,
+                    Dictionary<Stat, float[]>>(); //creating an empty Big dictionary of acquired type
+
+            foreach (CharacterClassProgression characterClass in
+                     characterClassesProgressions) //looking for all Classes in Classes container
             {
-                if (progressionStat.stat != stat) continue;                               //go to the next element if current doesn't match
-                if (progressionStat.levels.Length < currentLevel)                         //check if our Stat in Progression SO even has an acquired level 
+                var statLookupTable =
+                    new Dictionary<Stat, float[]>(); //creating an empty Small dictionary of acquired type
+
+                foreach (var progressionStat in
+                         characterClass.progressionStats) //looking for all Stats in Stats container
                 {
-                    Debug.Log($"{stat} max level in Progression SO is {progressionStat.levels.Length}, but level {currentLevel} is acquired");
+                    statLookupTable[progressionStat.stat] =
+                        progressionStat.levels; //setting Small Dictionary, Stat = key, Levels array = value
                 }
-                return progressionStat.levels[currentLevel - 1];                          //Layer 3, here is it, now send it back to GetStat!
+
+                _lookupTable[characterClass.characterClass] =
+                    statLookupTable; //setting Big Dictionary, Class = key, Small Dictionary = value
             }
-            Debug.Log($"Can't find acquired {stat} in Progression Stats in Progression SO"); 
-            return 11.2f;
         }
     }
 }

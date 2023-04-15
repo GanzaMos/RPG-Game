@@ -27,6 +27,10 @@ namespace RPG.SceneManagement
             if (Input.GetKeyDown(KeyCode.F9))
             {
                 Load();
+            }            
+            if (Input.GetKeyDown(KeyCode.Delete))
+            {
+                Delete();
             }
         }
 
@@ -40,6 +44,12 @@ namespace RPG.SceneManagement
         {
                 GetComponent<SavingSystem>().Load(DefaultSave);
                 print("Loaded!");
+        }        
+        
+        public void Delete()
+        {
+                GetComponent<SavingSystem>().Delete(DefaultSave);
+                print("Deleted!");
         }
     }
 }

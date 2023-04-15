@@ -18,7 +18,23 @@ namespace RPG.Control
         Ray _mousePositionRay;
         RaycastHit _rayHit;
 
-        
+        enum CursorType
+        {
+            None,
+            Movement,
+            Combat
+        }
+
+        [Serializable]
+        struct CursorMapping
+        {
+            public CursorType cursorType;
+            public Texture2D cursorTexture2D;
+            public Vector2 cursorHotspot;
+        }
+
+        [SerializeField] CursorMapping[] cursorMappings;
+
         //Starting setup
         
         void Start()
@@ -35,6 +51,7 @@ namespace RPG.Control
             RayToMousePosition();
             if (InteractWithCombat()) return;
             if (InteractWithMovement()) return;
+            SetCursor(CursorType.None);
         }
 
         void RayToMousePosition()
@@ -57,6 +74,8 @@ namespace RPG.Control
                 {
                     _fighter.SetTarget(combatTarget.gameObject);
                 }
+
+                SetCursor(CursorType.Combat);
                 return true;
             }
             return false;
@@ -70,9 +89,26 @@ namespace RPG.Control
                 {
                     _mover.MoveTo(_rayHit.point);
                 }
+                SetCursor(CursorType.Movement);
                 return true;
             }
             return false;
+        }
+
+        void SetCursor(CursorType cursorType)
+        {
+            CursorMapping mapping = GetCursorMapping(cursorType);
+            Cursor.SetCursor(mapping.cursorTexture2D, mapping.cursorHotspot, CursorMode.Auto);
+        }
+        
+        CursorMapping GetCursorMapping(CursorType cursorType)
+        {
+            foreach (CursorMapping element in cursorMappings)
+            {
+                if (element.cursorType != cursorType) continue;
+                return element;
+            }
+            return cursorMappings[0];
         }
     }
 }

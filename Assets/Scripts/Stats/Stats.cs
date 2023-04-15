@@ -3,6 +3,9 @@
     public enum Stat
     {
         Health,
-        ExperiencePointPerKill
+        ExperiencePointPerKill,
+        ExperienceToLevelUp,
+        AdditionalDamageBonus,
+        PercentageDamageBonus
     }
 }
