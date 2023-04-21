@@ -2,8 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using RPG.Attributes;
+using RPG.Combat;
+using RPG.Control;
 using RPG.Core;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Projectile : MonoBehaviour
 {
@@ -13,6 +16,7 @@ public class Projectile : MonoBehaviour
     [SerializeField] GameObject hitEffect = null;
     [SerializeField] GameObject[] objectsToDestroyInstantly;
     [SerializeField] float timeToDestroyAllProjectile;
+    [SerializeField] UnityEvent onHit;
 
     //Public variables
     float _projectileDamage;
@@ -64,6 +68,8 @@ public class Projectile : MonoBehaviour
         if (targetHealth)
         {
             targetHealth.ReduceHealth(_projectileDamage, _instigator);
+            targetHealth.transform.gameObject.GetComponent<AIController>().ProvokeEnemy(true);
+            onHit?.Invoke();
         }
 
         if (hitEffect)

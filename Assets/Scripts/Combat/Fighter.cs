@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using RPG.Core;
 using RPG.Attributes;
+using RPG.Control;
 using RPG.Movement;
 using RPG.Saving;
 using RPG.Stats;
@@ -15,8 +16,8 @@ namespace RPG.Combat
         //Serializable
         [SerializeField] Transform rightHandTransform = null;
         [SerializeField] Transform leftHandTransform = null;
-        [SerializeField] Weapon defaultWeapon = null;
-        [SerializeField] Weapon currentWeapon = null;
+        [SerializeField] WeaponConfig defaultWeaponConfig = null;
+        [SerializeField] WeaponConfig currentWeaponConfig = null;
         [SerializeField] float weaponAdditionDamageBonus;
         [SerializeField] float weaponPercentageDamageBonus;
 
@@ -24,7 +25,7 @@ namespace RPG.Combat
         float _timeSinceLastAttack = Mathf.Infinity;
         
         //Cashed
-        GameObject _currentWeaponPrefab;
+        Weapon _currentWeaponPrefab;
         Mover _mover;
         ActionScheduler _actionScheduler;
         Animator _animator;
@@ -42,7 +43,7 @@ namespace RPG.Combat
             _animator = GetComponent<Animator>()               ?? throw new Exception($"Missing Animator for Fighter in {gameObject.name}!");
             _baseStats = GetComponent<BaseStats>()             ?? throw new Exception($"Missing BaseStats for Fighter in {gameObject.name}!");
             
-            if (!currentWeapon) EquipWeapon(defaultWeapon);
+            if (!currentWeaponConfig) EquipWeapon(defaultWeaponConfig); //TODO method in Awake - not good
         }
 
 
@@ -80,34 +81,37 @@ namespace RPG.Combat
 
         bool IsNear()
         {
-            return Vector3.Distance(transform.position, _targetPosition.position) <= currentWeapon.WeaponRange;
+            return Vector3.Distance(transform.position, _targetPosition.position) <= currentWeaponConfig.WeaponRange;
         }
 
         void AttackBehavior()
         {
             transform.LookAt(_targetPosition);
-            if (_timeSinceLastAttack >= currentWeapon.TimeBetweenAttacks && !_targetHealth.IsDead)
+            if (_timeSinceLastAttack >= currentWeaponConfig.TimeBetweenAttacks && !_targetHealth.IsDead)
             {
                 //this will trigger animation Hit() or Shoot() effect
                 _animator.ResetTrigger("stopAttacking");
                 _animator.SetTrigger("attack");
-                _timeSinceLastAttack = 0f;
             }
         }
         
         void Hit()   //animation called method
         {
             if (!_targetHealth) return;
+            _timeSinceLastAttack = 0f;
             _targetHealth.ReduceHealth(GetTotalDamage(), gameObject);
+            _targetPosition?.GetComponent<AIController>().ProvokeEnemy(true);
+            _currentWeaponPrefab?.OnHit();
         }
 
         void Shoot()  //animation called method
         {
             if (!_targetHealth) return;
+            _timeSinceLastAttack = 0f;
             
-            if (currentWeapon.ProjectilePrefab)
+            if (currentWeaponConfig.ProjectilePrefab)
             {
-                currentWeapon.LaunchProjectile(rightHandTransform, leftHandTransform, _targetHealth, gameObject, GetTotalDamage());
+                currentWeaponConfig.LaunchProjectile(rightHandTransform, leftHandTransform, _targetHealth, gameObject, GetTotalDamage());
             }
         }
         
@@ -130,14 +134,14 @@ namespace RPG.Combat
         
         //Equipping weapon from Serialized field 
         
-        public void EquipWeapon(Weapon weapon)
+        public void EquipWeapon(WeaponConfig weaponConfig)
         {
-            if (weapon == null) return;
-            if (weapon == currentWeapon) return;
+            if (weaponConfig == null) return;
+            //if (weaponConfig == currentWeaponConfig) return;
             if (_currentWeaponPrefab) Destroy(_currentWeaponPrefab);
             
-            currentWeapon = weapon;
-            _currentWeaponPrefab = weapon.Spawn(rightHandTransform, leftHandTransform, _animator);
+            currentWeaponConfig = weaponConfig;
+            _currentWeaponPrefab = weaponConfig.Spawn(rightHandTransform, leftHandTransform, _animator);
         }
         
 
@@ -158,7 +162,7 @@ namespace RPG.Combat
         {
             if (stat == Stat.AdditionalDamageBonus)
             {
-                yield return currentWeapon.WeaponDamage;
+                yield return currentWeaponConfig.WeaponDamage;
                 yield return weaponAdditionDamageBonus;
             }
         }
@@ -194,13 +198,13 @@ namespace RPG.Combat
             Dictionary<string, object> fighterSave = new Dictionary<string, object>();
 
 
-            if (currentWeapon)
+            if (currentWeaponConfig)
             {
-                fighterSave["savedWeapon"] = currentWeapon.name;
+                fighterSave["savedWeapon"] = currentWeaponConfig.name;
             }
             else
             {
-                fighterSave["savedWeapon"] = defaultWeapon.name;
+                fighterSave["savedWeapon"] = defaultWeaponConfig.name;
             }
 
             if (_targetPosition == null)
@@ -239,8 +243,8 @@ namespace RPG.Combat
 
             //restoring saved weapon 
             string savedWeapon = (string)fighterSave["savedWeapon"];
-            currentWeapon = Resources.Load<Weapon>(savedWeapon);
-            EquipWeapon(currentWeapon);
+            currentWeaponConfig = Resources.Load<WeaponConfig>(savedWeapon);
+            EquipWeapon(currentWeaponConfig);
         }
 
 

@@ -3,6 +3,7 @@ using RPG.Core;
 using RPG.Saving;
 using RPG.Stats;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace RPG.Attributes
 {
@@ -17,7 +18,10 @@ namespace RPG.Attributes
         public float CurrentHealthPoints => currentHealthPoints;
 
         [SerializeField] const float LevelUpHealthPercentageRestore = 0.3f;
-        
+
+        [SerializeField] UnityEvent<float> reduceHealth;
+        [SerializeField] UnityEvent onDie;
+
         //Public variables
         bool _isDead;
         public bool IsDead => _isDead;
@@ -27,6 +31,7 @@ namespace RPG.Attributes
         BaseStats _baseStats;
         ActionScheduler _actionScheduler;
         CapsuleCollider _capsuleCollider;
+        HealthBarHandler _healthBarHandler;
 
        
         //Starting setup
@@ -38,6 +43,7 @@ namespace RPG.Attributes
             _actionScheduler = GetComponent<ActionScheduler>() ?? throw new Exception($"Missing ActionScheduler for Health in {gameObject.name}!");
             _capsuleCollider = GetComponent<CapsuleCollider>() ?? throw new Exception($"Missing CapsuleCollider for Health in {gameObject.name}!");
             _baseStats = GetComponent<BaseStats>()             ?? throw new Exception($"Missing BaseStats for Health in in {gameObject.name}");
+            _healthBarHandler = GetComponentInChildren<HealthBarHandler>() ?? throw new Exception($"Missing HealthBarHandler for Health in in {gameObject.name}");
         }
         
 
@@ -47,40 +53,45 @@ namespace RPG.Attributes
         {
             if (_isDead) return;
             
-            print(transform.name + " health = " + currentHealthPoints);
             currentHealthPoints = Mathf.Max(currentHealthPoints - healthAmountToReduce, 0);
-            SendDisplayEvent();
             
             if (currentHealthPoints <= 0)
             {
                 ExperienceAward(instigator);
+                onDie?.Invoke();
+                UpdateUI();
                 Die();
+            }
+            else
+            {
+                reduceHealth?.Invoke(healthAmountToReduce);
+                UpdateUI();
             }
         }
 
         public void RestoreHealth(float healthPointsToRestore)
         {
             currentHealthPoints = Mathf.Min(currentHealthPoints + healthPointsToRestore, maxHealthPoints);
-            SendDisplayEvent();
+            UpdateUI();
         }
 
         public void RestoreHealthPercentage(float healthPointsPercentageToRestore)
         {
             currentHealthPoints = Mathf.Min(maxHealthPoints * healthPointsPercentageToRestore + currentHealthPoints,maxHealthPoints);
-            SendDisplayEvent();
+            UpdateUI();
         }
 
         public void SetCurrentHealth(float healthPointsToSet)
         {
             currentHealthPoints = Mathf.Min(healthPointsToSet, maxHealthPoints);
             if (currentHealthPoints <= 0) Die();
-            SendDisplayEvent();
+            UpdateUI();
         }
 
         public void SetMaxLevelHealth()
         {
             maxHealthPoints = _baseStats.GetStat(Stat.Health);
-            SendDisplayEvent();
+            UpdateUI();
         }
 
 
@@ -138,13 +149,14 @@ namespace RPG.Attributes
             {
                 RestoreHealthPercentage(LevelUpHealthPercentageRestore);
             }
-            SendDisplayEvent();
+            UpdateUI();
         }
         
         //Display event method
         
-        void SendDisplayEvent()
+        void UpdateUI()
         {
+            _healthBarHandler.SetHealthPercentage(currentHealthPoints / maxHealthPoints);
             if (gameObject.tag != "Player") return;
             EventBus.OnHealthUpdated(currentHealthPoints, maxHealthPoints);
         }

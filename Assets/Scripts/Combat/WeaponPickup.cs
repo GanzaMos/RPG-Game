@@ -1,33 +1,31 @@
 ﻿using System;
 using System.Collections;
+using RPG.Control;
 using UnityEngine;
 
 namespace RPG.Combat
 {
-    public class WeaponPickup : MonoBehaviour
+    public class WeaponPickup : MonoBehaviour, IRaycastable
     {
-        [SerializeField] Weapon pickupWeapon;
+        [SerializeField] WeaponConfig pickupWeaponConfig;
         [SerializeField] float secondsToRespawn = 5f;
 
         void OnTriggerEnter(Collider other)
         {
-            //print("collided");
-            if (other.gameObject.tag == "Player")
-            {
-                //print("it's player");
-                other.GetComponent<Fighter>().EquipWeapon(pickupWeapon);
-                StartCoroutine(HideForSeconds(secondsToRespawn));
-            }
-        }
+            if (other.gameObject.tag != "Player") return;
+            
+            other.GetComponent<Fighter>().EquipWeapon(pickupWeaponConfig);
+            StartCoroutine(HideForSeconds(secondsToRespawn));
+        }   
 
         IEnumerator HideForSeconds(float secondsToRespawn)
         {
-            StatusSwitcher(false);
+            SetWeaponPickupActiveStatus(false);
             yield return new WaitForSeconds(secondsToRespawn);
-            StatusSwitcher(true);
+            SetWeaponPickupActiveStatus(true);
         }
 
-        void StatusSwitcher(bool isActive)
+        void SetWeaponPickupActiveStatus(bool isActive)
         {
             foreach (Transform child in transform)
             {
@@ -35,6 +33,11 @@ namespace RPG.Combat
             }
 
             GetComponent<Collider>().enabled = isActive;
+        }
+
+        public InteractType HandleRaycast()
+        {
+            return InteractType.Pickup;
         }
     }
     

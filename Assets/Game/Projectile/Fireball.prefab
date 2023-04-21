@@ -4915,6 +4915,9 @@ MonoBehaviour:
   objectsToDestroyInstantly:
   - {fileID: 310009575626165236}
   timeToDestroyAllProjectile: 0.2
+  onHit:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!65 &7501915272167153826
 BoxCollider:
   m_ObjectHideFlags: 0

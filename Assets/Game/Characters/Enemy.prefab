@@ -154,10 +154,42 @@ PrefabInstance:
       propertyPath: m_IsTrigger
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2827722183189413816, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2903587361554661262, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: m_RootOrder
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3137764981870581967, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
       propertyPath: maxSpeed
       value: 4
       objectReference: {fileID: 0}
+    - target: {fileID: 5742985025359935627, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: m_RootOrder
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5832977460252109025, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: 6e60ad64e34fc624ea76483921551c25, type: 3}
+    - target: {fileID: 5832977460252109025, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[1]
+      value: 
+      objectReference: {fileID: 8300000, guid: cc33d42442263404f9c18723ddf25ef7, type: 3}
+    - target: {fileID: 5832977460252109025, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[2]
+      value: 
+      objectReference: {fileID: 8300000, guid: 677a588867b19234ba2e66c09d82ba28, type: 3}
+    - target: {fileID: 5832977460252109025, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[3]
+      value: 
+      objectReference: {fileID: 8300000, guid: 1bf9ee80f2374534b80d6c5880558f5e, type: 3}
+    - target: {fileID: 5832977460252109025, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: 0a490d2ac2e526246ab488aed902f6f1, type: 3}
     - target: {fileID: 5895676224447155872, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
       propertyPath: weapon
       value: 
@@ -182,6 +214,10 @@ PrefabInstance:
       propertyPath: rightHandTransform
       value: 
       objectReference: {fileID: 1157351210909437007}
+    - target: {fileID: 5895676224447155872, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: defaultWeaponConfig
+      value: 
+      objectReference: {fileID: 11400000, guid: 1bb90b4fbec0dbc45a002ed45892ebf6, type: 2}
     - target: {fileID: 8730126464660787410, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
       propertyPath: m_Name
       value: Enemy
@@ -230,6 +266,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 9095161577468678143, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[0]
+      value: 
+      objectReference: {fileID: 8300000, guid: c67b8f28ccb1a184cba5b958315fb75f, type: 3}
+    - target: {fileID: 9095161577468678143, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[1]
+      value: 
+      objectReference: {fileID: 8300000, guid: 3298d4d468badd044b2ca8930315e21d, type: 3}
+    - target: {fileID: 9095161577468678143, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[2]
+      value: 
+      objectReference: {fileID: 8300000, guid: da4f5695bff34bf4b88959334d31f55f, type: 3}
+    - target: {fileID: 9095161577468678143, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[3]
+      value: 
+      objectReference: {fileID: 8300000, guid: 2ebf38d5081e6024eb5214ce611bd747, type: 3}
+    - target: {fileID: 9095161577468678143, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
+      propertyPath: audioClip.Array.data[4]
+      value: 
+      objectReference: {fileID: 8300000, guid: e7a068fc894ced2438c719feae89ea40, type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: a116cbb702dfdd34e974d1a384c0762a, type: 3}
 --- !u!1 &3416366992362540422 stripped
@@ -284,4 +340,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ec633ebeb2964120a0dfe9e618674324, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentExperience: 0
+  currentExperiencePoints: 0

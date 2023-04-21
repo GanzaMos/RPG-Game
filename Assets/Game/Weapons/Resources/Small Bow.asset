@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Small Bow
   m_EditorClassIdentifier: 
   animatorOverrideController: {fileID: 22100000, guid: 5bb417861ba6bfe4b897d8559824df8d, type: 2}
-  weaponPrefab: {fileID: 1563655986059756, guid: 7f105c0c272e6c146b4b41cdc53ea356, type: 3}
+  weaponPrefab: {fileID: 5957008488368750831, guid: 7f105c0c272e6c146b4b41cdc53ea356, type: 3}
   weaponHand: 0
   projectilePrefab: {fileID: 4530002585330096603, guid: fe681e84a83b2e14b895bff126e46ed0, type: 3}
   projectileIsHoming: 0

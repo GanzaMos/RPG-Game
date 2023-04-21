@@ -12,11 +12,17 @@ namespace RPG.Control
         //Serialized
         [SerializeField] float chaseDistance = 5f;
         [SerializeField] float maxSuspicionTime = 3f;
+        
+        [SerializeField] float maxProvokedTime = 5f;
+        [SerializeField] float neighboursProvokingRadius = 10f;
+        
         [SerializeField] PatrolPath patrolPath;
         [SerializeField] float waypointTolerance = 1f;
         [SerializeField] float maxDwellingTimeAtWaypoint = 3f;
         [Range(0,2)]
+        
         [SerializeField] float calmSpeedFraction = 0.5f;
+        
         
         //Cashed
         Transform _player;
@@ -26,16 +32,20 @@ namespace RPG.Control
         ActionScheduler _actionScheduler;
         
         //Local variables
+        bool _isProvoked = false;
+        public bool IsProvoked => _isProvoked;
+
         float _distanceToPlayer;
         Vector3 _guardPosition;
         float _timeSinceLastSawPlayer = Mathf.Infinity;
+        float _timeSinceBeenProvoked = Mathf.Infinity;
         float _dwellingTimeAtCurrentWaypoint = 0; 
         int _currentWaypointIndex = 0;
         
         
         //Starting setup
         
-        void Start()
+        void Awake()
         {
             _player = GameObject.FindWithTag("Player").transform;
             _fighter = GetComponent<Fighter>();
@@ -60,10 +70,11 @@ namespace RPG.Control
             if (_player == null) return;
             _distanceToPlayer = Vector3.Distance(transform.position, _player.position);
             
-            if (_distanceToPlayer <= chaseDistance)                //see the Player? Attack him!
+            if (_distanceToPlayer <= chaseDistance || _isProvoked)                //have seen the Player? Attack him!
             {
                 _fighter.SetTarget(_player.gameObject);
                 _timeSinceLastSawPlayer = 0f;
+                _timeSinceBeenProvoked = 0f;
             }
             else if(maxSuspicionTime >= _timeSinceLastSawPlayer)   //Player escaped you? Wait for a while
             {
@@ -73,9 +84,17 @@ namespace RPG.Control
             {
                 PatrolBehavior();
             }
+
+
+            if (_timeSinceBeenProvoked >= maxProvokedTime)
+            {
+                _isProvoked = false;
+            }
+
+            _timeSinceBeenProvoked += Time.deltaTime;
             _timeSinceLastSawPlayer += Time.deltaTime;
         }
-
+        
         void PatrolBehavior()
         {
             if (!patrolPath)                                 //Don't have patrol path? Go back to the starting point
@@ -102,6 +121,31 @@ namespace RPG.Control
             }
         }
 
+        
+        //Public methods
+
+        public void ProvokeEnemy(bool provokeEnemy, bool provokeEnemyNeighbours = true)
+        {
+            _isProvoked = provokeEnemy;
+            _timeSinceBeenProvoked = 0;
+            if (provokeEnemyNeighbours)
+            {
+                ProvokeNearbyEnemies();
+            }
+        }
+        
+
+        void ProvokeNearbyEnemies()
+        {
+            RaycastHit[] hits = Physics.SphereCastAll(transform.position, neighboursProvokingRadius, transform.forward, 0f);
+            
+            foreach (var hit in hits)
+            {
+                AIController aiControllerObject = hit.transform.GetComponent<AIController>();
+                if (!aiControllerObject) continue;
+                aiControllerObject.ProvokeEnemy(true, false);
+            }
+        }
 
         //Waypoints processing
         

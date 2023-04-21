@@ -1,6 +1,8 @@
 ﻿using System;
 using RPG.Saving;
 using System.Collections;
+using RPG.Control;
+using RPG.Movement;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
@@ -32,28 +34,27 @@ namespace RPG.SceneManagement
             DontDestroyOnLoad(this);
 
             Fader fader = FindObjectOfType<Fader>();
+            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
             yield return fader.FadeOut();
 
             SavingWrapper savingWrapper = FindObjectOfType<SavingWrapper>();
             if (savingWrapper != null) print("found savingWrapper");
             
-            //FindObjectOfType<SavingWrapper>().Save();
             savingWrapper.Save();
             
             yield return SceneManager.LoadSceneAsync(sceneToLoad);
-
+            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = false;
             
             savingWrapper.Load();
-            //FindObjectOfType<SavingWrapper>().Load();
-            
-            
+
             Transform anotherPortalSpawnPoint = GetAnotherPortalSpawnPoint();
             UpdatePlayerLocation(anotherPortalSpawnPoint);
             
             savingWrapper.Save();
             
             yield return new WaitForSeconds(0.5f); 
-            yield return fader.FadeIn();
+            fader.FadeIn();
+            GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>().enabled = true;
             
             Destroy(gameObject);
         }

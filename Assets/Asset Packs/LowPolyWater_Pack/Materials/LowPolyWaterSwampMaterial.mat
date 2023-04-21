@@ -2,17 +2,14 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 8
+  serializedVersion: 6
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: LowPolyWaterSwampMaterial
   m_Shader: {fileID: 4800000, guid: 16516895e8a79bf49a6562c3c3b84cbf, type: 3}
-  m_ValidKeywords: []
-  m_InvalidKeywords:
-  - _EMISSION
-  - _ISINNERALPHABLENDORCOLOR_ON
+  m_ShaderKeywords: 
   m_LightmapFlags: 1
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -130,7 +127,6 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    m_Ints: []
     m_Floats:
     - _Ambient: 1
     - _BumpScale: 1
@@ -181,7 +177,7 @@ Material:
     - WaveSpeed: {r: 1.086165, g: 4.440575, b: 12.105146, a: -3.0206447}
     - _AnimationDirection: {r: 0, g: 0, b: 0, a: 0}
     - _AnimationTiling: {r: 0.04582553, g: 0.0182, b: 0.045714468, a: 0.027129691}
-    - _BaseColor: {r: 0.33036664, g: 0.754717, b: 0.5995895, a: 1}
+    - _BaseColor: {r: 0.32941177, g: 0.7389035, b: 0.7529412, a: 1}
     - _BumpDirection: {r: 0, g: 0, b: 0, a: 2}
     - _BumpMap_ST: {r: 1, g: 1, b: 0, a: 0}
     - _BumpTiling: {r: 0.02, g: 0.01, b: 0.01, a: 0.01}
@@ -216,7 +212,7 @@ Material:
     - _ShoreColor: {r: 1, g: 1, b: 1, a: 1}
     - _ShorePerturbation: {r: 0, g: 0, b: 0, a: 0}
     - _ShoreTiling: {r: 1, g: 1, b: 0.1, a: 0.1}
-    - _SpecColor: {r: 0.16062653, g: 0.4433962, b: 0.19163367, a: 1}
+    - _SpecColor: {r: 0.16078433, g: 0.4193384, b: 0.44313726, a: 1}
     - _SpecularColor: {r: 0.91791046, g: 0.91791046, b: 0.91791046, a: 1}
     - _UnderwaterColor: {r: 0.6950323, g: 0.89552236, b: 0.7502397, a: 1}
     - _WaveOffset: {r: -0, g: -0, b: -0, a: -0}
