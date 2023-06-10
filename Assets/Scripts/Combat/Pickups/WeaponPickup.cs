@@ -13,9 +13,18 @@ namespace RPG.Combat
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.tag != "Player") return;
-            
-            other.GetComponent<Fighter>().EquipWeapon(pickupWeaponConfig);
-            StartCoroutine(HideForSeconds(secondsToRespawn));
+
+            var fighter = GetComponent<Fighter>();
+
+            if (fighter != null)
+            {
+                fighter.EquipWeapon(pickupWeaponConfig);
+                StartCoroutine(HideForSeconds(secondsToRespawn));
+            }
+            else
+            {
+                Debug.LogError($"Missing Fighter in {other.name} for WeaponPickup, ID {GetInstanceID()}");
+            }
         }   
 
         IEnumerator HideForSeconds(float secondsToRespawn)
@@ -35,9 +44,9 @@ namespace RPG.Combat
             GetComponent<Collider>().enabled = isActive;
         }
 
-        public InteractType HandleRaycast()
+        public EInteractType HandleRaycast()
         {
-            return InteractType.Pickup;
+            return EInteractType.Pickup;
         }
     }
     

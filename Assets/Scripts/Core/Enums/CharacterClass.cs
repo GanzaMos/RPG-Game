@@ -3,11 +3,10 @@
     public enum CharacterClass
     {
         None,
-        Fighter,
-        Barbarian,
-        Thief,
+        Player,
         EnemyGuard,
         EnemyArcher,
-        Mage
+        EnemyCaptain,
+        Civilian,
     }
 }

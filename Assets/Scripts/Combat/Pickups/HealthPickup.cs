@@ -14,9 +14,17 @@ namespace RPG.Combat
         void OnTriggerEnter(Collider other)
         {
             if (other.gameObject.tag != "Player") return;
-            
-            other.GetComponent<Health>().RestoreHealth(healthHealAmount);
-            StartCoroutine(HideForSeconds(secondsToRestore));
+
+            var health = other.GetComponent<Health>();
+            if (health != null)
+            {
+                health.RestoreHealth(healthHealAmount);
+                StartCoroutine(HideForSeconds(secondsToRestore));
+            }
+            else
+            {
+                Debug.LogError($"Can't find Health for HealthPickup OnTriggerEnter in ID {GetInstanceID()}");
+            }
         }   
         
         IEnumerator HideForSeconds(float secondsToRespawn)
@@ -33,12 +41,16 @@ namespace RPG.Combat
                 child.gameObject.SetActive(isActive);
             }
 
-            GetComponent<Collider>().enabled = isActive;
+            var collider = GetComponent<Collider>();
+            if (collider != null)
+                collider.enabled = isActive;
+            else
+                Debug.LogError($"Can't find Collider for HealthPickup SetPrefabPickupActiveStatus in ID {GetInstanceID()}");
         }
 
-        public InteractType HandleRaycast()
+        public EInteractType HandleRaycast()
         {
-            return InteractType.Pickup;
+            return EInteractType.Pickup;
         }
     }
 }
