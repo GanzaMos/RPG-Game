@@ -2,6 +2,6 @@
 {
     public interface IRaycastable
     {
-        public InteractType HandleRaycast();
+        public EInteractType HandleRaycast();
     }
 }

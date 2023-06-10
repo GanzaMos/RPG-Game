@@ -59,17 +59,16 @@ public class Projectile : MonoBehaviour
     void OnTriggerEnter(Collider other)
     {
         Health targetHealth = other.GetComponent<Health>();
-        if (!targetHealth)
-        {
-            print($"Missing target Health for {gameObject.name} Projectile!");
-            return;
-        }
-        
         if (targetHealth)
         {
             targetHealth.ReduceHealth(_projectileDamage, _instigator);
-            targetHealth.transform.gameObject.GetComponent<AIController>().ProvokeEnemy(true);
+            targetHealth.transform.gameObject.GetComponent<EnemyAIStateManager>().ProvokeEnemy(true); //todo need to send optional debug message if fail to get component
             onHit?.Invoke();
+        }
+        else
+        {
+            print($"Missing target Health for {gameObject.name} Projectile!");
+            return;
         }
 
         if (hitEffect)
@@ -77,6 +76,7 @@ public class Projectile : MonoBehaviour
             Instantiate(hitEffect, _targetMiddlePoint, Quaternion.identity);
         }
 
+        //todo need to be a pool
         foreach (var objectToDestroy in objectsToDestroyInstantly)
         {
             Destroy(objectToDestroy);
@@ -90,7 +90,7 @@ public class Projectile : MonoBehaviour
     
     public void SetTarget(Health health, GameObject instigator)
     {
-        _health = health;
+        _health = health; //todo probably need to be Character
         _instigator = instigator;
         _targetCapsuleCollider = _health.transform.GetComponent<CapsuleCollider>() ?? throw new Exception($"Missing CapsuleCollider for Projectile in {gameObject.name}!");
         SetRotation();

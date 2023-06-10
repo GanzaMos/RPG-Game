@@ -19,16 +19,16 @@ namespace RPG.Attributes
 
         void OnEnable()
         {
-            EventBus.OnHealthUpdated += SetHealthValueDisplay;
-            EventBus.OnExpUpdated += SetExperienceValueDisplay;
-            EventBus.OnLevelUpdated += SetLevelValueDisplay;
+            EventBusUI.OnHealthUpdated += SetHealthValueDisplay;
+            EventBusUI.OnExpUpdated += SetExperienceValueDisplay;
+            EventBusUI.OnLevelUpdated += SetLevelValueDisplay;
         }
 
         void OnDisable()
         {
-            EventBus.OnHealthUpdated -= SetHealthValueDisplay;
-            EventBus.OnExpUpdated -= SetExperienceValueDisplay;
-            EventBus.OnLevelUpdated -= SetLevelValueDisplay;
+            EventBusUI.OnHealthUpdated -= SetHealthValueDisplay;
+            EventBusUI.OnExpUpdated -= SetExperienceValueDisplay;
+            EventBusUI.OnLevelUpdated -= SetLevelValueDisplay;
         }
 
 

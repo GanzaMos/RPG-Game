@@ -1,5 +1,7 @@
 ﻿using System;
+using RPG.Combat;
 using RPG.Core;
+using RPG.Movement;
 using RPG.Saving;
 using RPG.Stats;
 using UnityEngine;
@@ -11,39 +13,34 @@ namespace RPG.Attributes
     public class Health : MonoBehaviour, ISaveable, ILevelUpdate
     {
         //Serializable
-        [SerializeField] float maxHealthPoints = 99f;
-        public float MaxHealthPoints => maxHealthPoints;
-
-        [SerializeField] float currentHealthPoints;
-        public float CurrentHealthPoints => currentHealthPoints;
-
-        [SerializeField] const float LevelUpHealthPercentageRestore = 0.3f;
-
         [SerializeField] UnityEvent<float> reduceHealth;
         [SerializeField] UnityEvent onDie;
-
-        //Public variables
-        bool _isDead;
-        public bool IsDead => _isDead;
         
         //Cashed
         Animator _animator;
         BaseStats _baseStats;
-        ActionScheduler _actionScheduler;
         CapsuleCollider _capsuleCollider;
         HealthBarHandler _healthBarHandler;
+        Character _ch;
 
        
         //Starting setup
         
         void Awake()
         {
-            _baseStats = GetComponent<BaseStats>()             ?? throw new Exception($"Missing BaseStat for Health in {gameObject.name}!");
-            _animator = GetComponent<Animator>()               ?? throw new Exception($"Missing Animator for Health in {gameObject.name}!");
-            _actionScheduler = GetComponent<ActionScheduler>() ?? throw new Exception($"Missing ActionScheduler for Health in {gameObject.name}!");
-            _capsuleCollider = GetComponent<CapsuleCollider>() ?? throw new Exception($"Missing CapsuleCollider for Health in {gameObject.name}!");
-            _baseStats = GetComponent<BaseStats>()             ?? throw new Exception($"Missing BaseStats for Health in in {gameObject.name}");
-            _healthBarHandler = GetComponentInChildren<HealthBarHandler>() ?? throw new Exception($"Missing HealthBarHandler for Health in in {gameObject.name}");
+            _ch = GetComponentInParent<Character>() ?? InstError<Character>();
+            _baseStats = GetComponent<BaseStats>() ?? InstError<BaseStats>();
+            _animator = GetComponent<Animator>() ?? InstError<Animator>();
+            _capsuleCollider = GetComponent<CapsuleCollider>() ?? InstError<CapsuleCollider>();
+            _baseStats = GetComponent<BaseStats>() ?? InstError<BaseStats>();
+            _healthBarHandler = GetComponentInChildren<HealthBarHandler>() ?? InstError<HealthBarHandler>();
+        }
+        
+        T InstError<T>()
+        {
+            string className = typeof(T).Name;
+            if (typeof(T) is Character) throw new Exception($"Missing {className} component for {name}, ID {GetInstanceID()}");
+            else throw new Exception($"Missing {className} component for {name} in {_ch?.gameObject.name}, ID {GetInstanceID()}");
         }
         
 
@@ -51,11 +48,12 @@ namespace RPG.Attributes
 
         public void ReduceHealth(float healthAmountToReduce, GameObject instigator = null)
         {
-            if (_isDead) return;
+            if (_ch.data.health.IsDead) 
+                return;
             
-            currentHealthPoints = Mathf.Max(currentHealthPoints - healthAmountToReduce, 0);
+            _ch.data.health.CurrentHealth = Mathf.Max(_ch.data.health.CurrentHealth - healthAmountToReduce, 0);
             
-            if (currentHealthPoints <= 0)
+            if (_ch.data.health.CurrentHealth <= 0)
             {
                 ExperienceAward(instigator);
                 onDie?.Invoke();
@@ -71,26 +69,35 @@ namespace RPG.Attributes
 
         public void RestoreHealth(float healthPointsToRestore)
         {
-            currentHealthPoints = Mathf.Min(currentHealthPoints + healthPointsToRestore, maxHealthPoints);
+            _ch.data.health.CurrentHealth = Mathf.Min(
+                _ch.data.health.CurrentHealth + healthPointsToRestore,
+                _ch.data.health.MaxHealth);
             UpdateUI();
         }
 
         public void RestoreHealthPercentage(float healthPointsPercentageToRestore)
         {
-            currentHealthPoints = Mathf.Min(maxHealthPoints * healthPointsPercentageToRestore + currentHealthPoints,maxHealthPoints);
+            _ch.data.health.CurrentHealth = Mathf.Min(
+                _ch.data.health.MaxHealth * healthPointsPercentageToRestore + _ch.data.health.CurrentHealth,
+                _ch.data.health.MaxHealth);
             UpdateUI();
         }
 
         public void SetCurrentHealth(float healthPointsToSet)
         {
-            currentHealthPoints = Mathf.Min(healthPointsToSet, maxHealthPoints);
-            if (currentHealthPoints <= 0) Die();
+            _ch.data.health.CurrentHealth = Mathf.Min(
+                healthPointsToSet, 
+                _ch.data.health.MaxHealth);
+            
+            if (_ch.data.health.CurrentHealth <= 0) 
+                Die();
+            
             UpdateUI();
         }
 
         public void SetMaxLevelHealth()
         {
-            maxHealthPoints = _baseStats.GetStat(Stat.Health);
+            _ch.data.health.MaxHealth = _baseStats.GetStat(Stat.Health);
             UpdateUI();
         }
 
@@ -101,7 +108,8 @@ namespace RPG.Attributes
         {
             float expPerKill = _baseStats.GetStat(Stat.ExperiencePointPerKill);
 
-            Experience instigatorExperience;
+            //todo need to move instigator to Data base;
+            Experience instigatorExperience;  
             instigatorExperience = instigator.GetComponent<Experience>();
             if (!instigatorExperience)
             {
@@ -113,17 +121,19 @@ namespace RPG.Attributes
 
         void Die(string deathTriggerName = "death")
         {
-            _isDead = true;
+            _ch.data.health.IsDead = true;
             _animator.SetTrigger(deathTriggerName);
-            _actionScheduler.CancelCurrentAction();
+            GetComponent<Mover>()?.Cancel();
+            GetComponent<Fighter>()?.Cancel();
             _capsuleCollider.enabled = false;
         }
 
         void Resurrect(string resurrectTriggerName = "instantResurrection")
         {
-            _isDead = false;
+            _ch.data.health.IsDead = false;
             _animator.SetTrigger(resurrectTriggerName);
-            _actionScheduler.CancelCurrentAction();
+            GetComponent<Mover>()?.Cancel();
+            GetComponent<Fighter>()?.Cancel();
             _capsuleCollider.enabled = true;
         }
 
@@ -139,16 +149,15 @@ namespace RPG.Attributes
 
         public void SetNewLevelChanges()
         {
-            float oldMaxHealth = maxHealthPoints;
+            float oldMaxHealth = _ch.data.health.MaxHealth;
             SetMaxLevelHealth();
-            if (currentHealthPoints == oldMaxHealth)
-            {
-                currentHealthPoints = maxHealthPoints;
-            }
+            
+            //if character had a max health before leveling up - it should stay at the max level
+            if (_ch.data.health.CurrentHealth == oldMaxHealth)
+                _ch.data.health.CurrentHealth = _ch.data.health.MaxHealth;
             else
-            {
-                RestoreHealthPercentage(LevelUpHealthPercentageRestore);
-            }
+                RestoreHealthPercentage(_ch.data.health.LevelUpPercentageRestore);
+            
             UpdateUI();
         }
         
@@ -156,9 +165,9 @@ namespace RPG.Attributes
         
         void UpdateUI()
         {
-            _healthBarHandler.SetHealthPercentage(currentHealthPoints / maxHealthPoints);
+            _healthBarHandler.SetHealthPercentage(_ch.data.health.CurrentHealth / _ch.data.health.MaxHealth);
             if (gameObject.tag != "Player") return;
-            EventBus.OnHealthUpdated(currentHealthPoints, maxHealthPoints);
+            EventBusUI.OnHealthUpdated(_ch.data.health.CurrentHealth, _ch.data.health.MaxHealth);
         }
 
 
@@ -166,26 +175,26 @@ namespace RPG.Attributes
         
         public object CaptureState()
         {
-            return currentHealthPoints;
+            return _ch.data.health.CurrentHealth;
         }
         
         public void RestoreState(object state)
         {
             float savedHealthPoint = (float) state;
             
-            if (currentHealthPoints <= 0 && savedHealthPoint > 0)
+            if (_ch.data.health.CurrentHealth <= 0 && savedHealthPoint > 0)
             {
                 Resurrect();
-                currentHealthPoints = savedHealthPoint;
+                _ch.data.health.CurrentHealth = savedHealthPoint;
             }
-            else if (currentHealthPoints > 0 && savedHealthPoint <= 0)
+            else if (_ch.data.health.CurrentHealth > 0 && savedHealthPoint <= 0)
             {
                 Die();
-                currentHealthPoints = savedHealthPoint;
+                _ch.data.health.CurrentHealth = savedHealthPoint;
             }
             else
             {
-                currentHealthPoints = savedHealthPoint;
+                _ch.data.health.CurrentHealth = savedHealthPoint;
             }
         }
     }

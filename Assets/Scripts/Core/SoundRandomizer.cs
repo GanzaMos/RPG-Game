@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace RPG.Core
 {
@@ -10,7 +12,7 @@ namespace RPG.Core
 
         void Awake()
         {
-            _audioSource = GetComponent<AudioSource>();
+            _audioSource = GetComponent<AudioSource>() ?? throw new Exception($"Missing AudioSource component for {name}, ID {GetInstanceID()}");
         }
 
         public void PlayRandomSound()

@@ -15,7 +15,9 @@ namespace RPG.Cinematic
             if(!_alreadyTriggered && other.gameObject.tag == "Player")
             {
                 _alreadyTriggered = true;
-                GetComponent<PlayableDirector>().Play();
+                var playableDirector = GetComponent<PlayableDirector>();
+                if (playableDirector == null) print("Can't find playableDirector in Player to run CinematicTrigger");
+                else playableDirector.Play();
             }
         }
     }

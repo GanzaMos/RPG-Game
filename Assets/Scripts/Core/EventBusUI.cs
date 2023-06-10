@@ -1,6 +1,6 @@
 ﻿using System;
 
-public static class EventBus
+public static class EventBusUI
 {
     public static Action<float, float> OnHealthUpdated;
     public static Action<float> OnExpUpdated;

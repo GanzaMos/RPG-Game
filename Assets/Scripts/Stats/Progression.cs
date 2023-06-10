@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using RPG.Core;
 using UnityEngine;
 
 namespace RPG.Stats

@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public enum InteractType
+public enum EInteractType
 {
     None,
     Movement,

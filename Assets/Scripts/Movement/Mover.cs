@@ -1,70 +1,95 @@
+using System;
 using System.Collections.Generic;
 using RPG.Core;
 using RPG.Attributes;
+using RPG.Combat;
 using UnityEngine;
 using UnityEngine.AI;
 using RPG.Saving;
+using Random = UnityEngine.Random;
 
 namespace RPG.Movement
 {
-    [RequireComponent(typeof(ActionScheduler))]
     [RequireComponent(typeof(NavMeshAgent))]
-    public class Mover : MonoBehaviour, IAction, ISaveable
+    public class Mover : MonoBehaviour, ISaveable
     {
-        [SerializeField] float maxSpeed;
+        float _maxSpeed;
         
         NavMeshAgent _navMeshAgent;
         Animator _animator;
-        ActionScheduler _actionScheduler;
-        Health _health;
-
-        float _speedFraction;
+        Character _ch;
 
         void Awake()
         {
-            _navMeshAgent = GetComponent<NavMeshAgent>();
-            _animator = GetComponent<Animator>();
-            _actionScheduler = GetComponent<ActionScheduler>();
-            _health = GetComponent<Health>();
-            maxSpeed = GetComponent<NavMeshAgent>().speed;
+            _ch = GetComponentInParent<Character>() ?? InstError<Character>();
+            _navMeshAgent = GetComponent<NavMeshAgent>() ?? InstError<NavMeshAgent>();
+            _animator = GetComponent<Animator>() ?? InstError<Animator>();
+            _maxSpeed = GetComponent<NavMeshAgent>().speed;
+        }
+        
+        T InstError<T>()
+        {
+            string className = typeof(T).Name;
+            if (typeof(T) is Character) throw new Exception($"Missing {className} component for {name}, ID {GetInstanceID()}");
+            else throw new Exception($"Missing {className} component for {name} in {_ch?.gameObject.name}, ID {GetInstanceID()}");
         }
 
         void Update()
         {
-            _navMeshAgent.enabled = !_health.IsDead;
+            _navMeshAgent.enabled = !_ch.data.health.IsDead;
             UpdateAnimator();
         }
         
         public void MoveTo(Vector3 destination)
         {
-            _actionScheduler.StartAction(this);            //canceling all previous actions
+            // _actionScheduler.StartAction(this);            //canceling all previous actions
+            GetComponent<Fighter>().playerIsAttacking = false; //todo temporary solution, need to implement FSM for Player
             _navMeshAgent.isStopped = false;               
-            _navMeshAgent.speed = maxSpeed;
+            _navMeshAgent.speed = _maxSpeed;
             _navMeshAgent.SetDestination(destination);
         }
         
         public void MoveTo(Vector3 destination, float speedFraction)
         {
-            _actionScheduler.StartAction(this);
+            //_actionScheduler.StartAction(this);
             _navMeshAgent.isStopped = false;
-            _navMeshAgent.speed = maxSpeed * speedFraction;
+            _navMeshAgent.speed = _maxSpeed * speedFraction;
             _navMeshAgent.SetDestination(destination);
         }
         
         public void MoveToAttack(Vector3 destination)
         {
             _navMeshAgent.isStopped = false;
-            _navMeshAgent.speed = maxSpeed;
+            _navMeshAgent.speed = _maxSpeed;
             _navMeshAgent.SetDestination(destination);
         }
         
         public void MoveToAttack(Vector3 destination, float speedFraction)
         {
             _navMeshAgent.isStopped = false;
-            _navMeshAgent.speed = maxSpeed * speedFraction;
+            _navMeshAgent.speed = _maxSpeed * speedFraction;
             _navMeshAgent.SetDestination(destination);
         }
 
+        public bool RandomPoint(Vector3 center, float range, out Vector3 result)
+        {
+            Vector3 randomPoint = new Vector3();
+
+            //todo need a script with ray casting so it will guarantee find a point on NavMesh; 
+            for (int i = 0; i < 30; i++)
+            {
+                randomPoint = center + Random.insideUnitSphere * range;
+                NavMeshHit hit;
+                if (NavMesh.SamplePosition(randomPoint, out hit, 1.0f, NavMesh.AllAreas))
+                {
+                    result = hit.position;
+                    return true;
+                }
+            }
+            result = center;
+            return false;
+        }
+        
         public void Cancel()
         {
             _navMeshAgent.isStopped = true;

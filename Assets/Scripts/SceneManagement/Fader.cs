@@ -12,7 +12,7 @@ namespace RPG.SceneManagement
 
         void Awake()
         {
-            _canvasGroup = GetComponent<CanvasGroup>();
+            _canvasGroup = GetComponent<CanvasGroup>() ?? throw new Exception($"Missing CanvasGroup component for {name}");
         }
 
         public IEnumerator FadeOutAndIn()

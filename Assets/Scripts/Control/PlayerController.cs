@@ -17,8 +17,8 @@ namespace RPG.Control
         //Cashed
         Mover _mover;
         Fighter _fighter;
-        Health _health;
-        
+        Character _ch;
+
         //Local variables
         Ray _mousePositionRay;
         RaycastHit _rayHit;
@@ -27,7 +27,7 @@ namespace RPG.Control
         [Serializable]
         struct CursorMapping
         {
-            public InteractType interactType;
+            public EInteractType eInteractType;
             public Texture2D cursorTexture2D;
             public Vector2 cursorHotspot;
         }
@@ -40,9 +40,16 @@ namespace RPG.Control
         
         void Awake()
         {
-            _mover = GetComponent<Mover>()       ?? throw new Exception($"Missing Mover for PlayerController in {gameObject.name}");
-            _fighter = GetComponent<Fighter>()   ?? throw new Exception($"Missing Fighter for PlayerController in {gameObject.name}");
-            _health = GetComponent<Health>()     ?? throw new Exception($"Missing Health for PlayerController in {gameObject.name}");
+            _ch = GetComponentInParent<Character>() ?? InstError<Character>();
+            _mover = GetComponent<Mover>() ?? InstError<Mover>();
+            _fighter = GetComponent<Fighter>() ?? InstError<Fighter>();
+        }
+        
+        T InstError<T>()
+        {
+            string className = typeof(T).Name;
+            if (typeof(T) is Character) throw new Exception($"Missing {className} component for {name}, ID {GetInstanceID()}");
+            else throw new Exception($"Missing {className} component for {name} in {_ch?.gameObject.name}, ID {GetInstanceID()}");
         }
 
         void Update()
@@ -63,7 +70,7 @@ namespace RPG.Control
         {
             if (EventSystem.current.IsPointerOverGameObject())
             {
-                SetCursor(InteractType.UI);
+                SetCursor(EInteractType.UI);
                 return true;
             }
             else return false;
@@ -71,9 +78,9 @@ namespace RPG.Control
 
         bool CheckIfPlayerIsDead()
         {
-            if (_health.IsDead)
+            if (_ch.data.health.IsDead)
             {
-                SetCursor(InteractType.Movement);
+                SetCursor(EInteractType.Movement);
                 return true;
             }
 
@@ -118,7 +125,7 @@ namespace RPG.Control
 
             if (!isNavMeshNear)
             {
-                SetCursor(InteractType.None);
+                SetCursor(EInteractType.None);
                 return true;
             }
             else
@@ -140,21 +147,21 @@ namespace RPG.Control
             //checking if path is completely available (need to exclude NavMesh islands)
             if (path.status != NavMeshPathStatus.PathComplete)
             {
-                SetCursor(InteractType.None);
+                SetCursor(EInteractType.None);
                 return false;
             }
             
             //checking if path is small enough so we won't go through all the map
             if (lengthSoFar > maxNavMeshEdgePathDistance)
             {
-                SetCursor(InteractType.None);
+                SetCursor(EInteractType.None);
                 return false;
             }
             
             //finally go there!
             else
             {
-                SetCursor(InteractType.Movement);
+                SetCursor(EInteractType.Movement);
                 InteractWithMovement();
                 return true;
             }
@@ -166,21 +173,23 @@ namespace RPG.Control
         bool InteractWithRaycastableComponent(GameObject nearestRaycastableObject)
         {
             //Setting behavior depend on HandleRaycast() return value in IRaycastable object;
-            InteractType nearestObjectInteractType = nearestRaycastableObject.GetComponent<IRaycastable>().HandleRaycast();
+            EInteractType nearestObjectEInteractType = nearestRaycastableObject.GetComponent<IRaycastable>().HandleRaycast();
             
-            if (nearestObjectInteractType == InteractType.Combat)
+            if (nearestObjectEInteractType == EInteractType.Combat)
             {
-                Health health = nearestRaycastableObject.GetComponent<Health>();
-                if (health.IsDead) return false;
+                Character targetCharacter = nearestRaycastableObject.GetComponent<Character>();
                 
-                SetCursor(InteractType.Combat);
+                if (targetCharacter.data.health.IsDead) 
+                    return false;
+                
+                SetCursor(EInteractType.Combat);
                 InteractWithCombat(nearestRaycastableObject);
                 return true;
             }
             
-            if (nearestObjectInteractType == InteractType.Pickup)
+            if (nearestObjectEInteractType == EInteractType.Pickup)
             {
-                SetCursor(InteractType.Pickup);
+                SetCursor(EInteractType.Pickup);
                 InteractWithMovement();
                 return true;
             }
@@ -191,17 +200,13 @@ namespace RPG.Control
         void InteractWithCombat(GameObject combatTarget)
         {
             if (Input.GetMouseButton(0))
-            {
                 _fighter.SetTarget(combatTarget);
-            }
         }
         
         void InteractWithMovement()
         {
             if (Input.GetMouseButton(0))
-            {
                 _mover.MoveTo(_rayHit.point);
-            }
         }
         
         
@@ -212,17 +217,17 @@ namespace RPG.Control
             _mousePositionRay = Camera.main.ScreenPointToRay(Input.mousePosition);
         }
 
-        void SetCursor(InteractType interactType)
+        void SetCursor(EInteractType eInteractType)
         {
-            CursorMapping mapping = GetCursorMapping(interactType);
+            CursorMapping mapping = GetCursorMapping(eInteractType);
             Cursor.SetCursor(mapping.cursorTexture2D, mapping.cursorHotspot, CursorMode.Auto);
         }
         
-        CursorMapping GetCursorMapping(InteractType interactType)
+        CursorMapping GetCursorMapping(EInteractType eInteractType)
         {
             foreach (CursorMapping element in cursorMappings)
             {
-                if (element.interactType != interactType) continue;
+                if (element.eInteractType != eInteractType) continue;
                 return element;
             }
             return cursorMappings[0];

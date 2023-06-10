@@ -46,9 +46,9 @@ GameObject:
   - component: {fileID: 6318645719495135138}
   - component: {fileID: 1911474311518871998}
   - component: {fileID: 8998395750835951929}
+  - component: {fileID: 241204269791896061}
   - component: {fileID: 3137764981870581967}
   - component: {fileID: 5895676224447155872}
-  - component: {fileID: 5573028686660351577}
   - component: {fileID: 296989273684377999}
   - component: {fileID: 1337219401281969313}
   - component: {fileID: 659112429529578755}
@@ -191,6 +191,64 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &241204269791896061
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8730126464660787410}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90f910923def43a3ac36699521a6b763, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data:
+    vision:
+      horizontalAngle: 0
+      horizontalAngleCos: 0
+      verticalAngle: 0
+      bottomVertex: 0
+      topVertex: 0
+      farRadius: 0
+      farRadiusSqr: 0
+      closeRadius: 0
+      closeRadiusSqr: 0
+      farAwarenessIncreaseRate: 0
+      closeAwarenessIncreaseRate: 0
+    hearing:
+      radius: 0
+      radiusSqr: 0
+      awarenessIncreaseRate: 0
+    sense:
+      farRadius: 0
+      farRadiusSqr: 0
+      closeRadius: 0
+      closeRadiusSqr: 0
+      closeAwarenessIncreaseRate: 0
+      farAwarenessIncreaseRate: 0
+    awareness:
+      decreaseRate: 0
+      decreaseDelay: 0
+      currentLevel: 0
+      maxLevel: 0
+      minLevel: 0
+    health:
+      maxHealth: 0
+      currentHealth: 0
+      levelUpPercentageRestore: 0
+      isDead: 0
+    experience:
+      currentExperiencePoints: 0
+      currentLevel: 0
+    ai:
+      maxSuspicionTime: 0
+      maxProvokedTime: 0
+      neighboursProvokingRadius: 0
+      waypointTolerance: 0
+      maxDwellingTimeAtWaypoint: 0
+      calmSpeedFraction: 0
+  startStatPresetSo: {fileID: 0}
 --- !u!114 &3137764981870581967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -203,7 +261,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6e755c7a1af8737459eabfa420fc8625, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxSpeed: 0
 --- !u!114 &5895676224447155872
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -222,18 +279,6 @@ MonoBehaviour:
   currentWeaponConfig: {fileID: 0}
   weaponAdditionDamageBonus: 0
   weaponPercentageDamageBonus: 0
---- !u!114 &5573028686660351577
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8730126464660787410}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 21a372c27d0b4262a4f3bb64ab23484d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &296989273684377999
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -386,6 +431,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SoundContainerOnDamage
       objectReference: {fileID: 0}
+    - target: {fileID: 6588409000040664861, guid: cee9b341e9b9804449dc7518c6b15503, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7661071113221879173, guid: cee9b341e9b9804449dc7518c6b15503, type: 3}
       propertyPath: audioClip.Array.size
       value: 5
@@ -443,9 +492,21 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 2077948742534265774, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2149045312359518632, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
       propertyPath: m_Name
       value: HealthBar
+      objectReference: {fileID: 0}
+    - target: {fileID: 2149045312359518632, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2425096989512532599, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2762496177531605814, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
       propertyPath: scale
@@ -458,6 +519,10 @@ PrefabInstance:
     - target: {fileID: 4261264551407709728, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
       propertyPath: m_Enabled
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5772918612309014622, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7194247709699583111, guid: 3b267fb323851b74891b83fd77584af2, type: 3}
       propertyPath: m_RootOrder
@@ -565,6 +630,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: SoundContainerOnDie
       objectReference: {fileID: 0}
+    - target: {fileID: 6588409000040664861, guid: cee9b341e9b9804449dc7518c6b15503, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7661071113221879173, guid: cee9b341e9b9804449dc7518c6b15503, type: 3}
       propertyPath: audioClip.Array.size
       value: 5
@@ -621,6 +690,10 @@ PrefabInstance:
     - target: {fileID: 3702920080649855267, guid: 25482010ad5edc54a83f8eed2e7792c4, type: 3}
       propertyPath: m_Name
       value: Damage Text Spawner
+      objectReference: {fileID: 0}
+    - target: {fileID: 3702920080649855267, guid: 25482010ad5edc54a83f8eed2e7792c4, type: 3}
+      propertyPath: m_Layer
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 7856434694634007788, guid: 25482010ad5edc54a83f8eed2e7792c4, type: 3}
       propertyPath: m_RootOrder

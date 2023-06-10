@@ -10,9 +10,9 @@ namespace RPG.Combat
     
     public class CombatTarget : MonoBehaviour, IRaycastable
     {
-        public InteractType HandleRaycast()
+        public EInteractType HandleRaycast()
         {
-            return InteractType.Combat;
+            return EInteractType.Combat;
         }
     }
 }

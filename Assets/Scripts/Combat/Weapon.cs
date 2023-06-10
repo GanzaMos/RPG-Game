@@ -9,7 +9,7 @@ namespace RPG.Combat
         
         public void OnHit()
         {
-            print("Hit from Weapon!");
+            print("Hit from Weapon!"); //todo need to be optional debug message
             onHitEvent?.Invoke();
         }
     }

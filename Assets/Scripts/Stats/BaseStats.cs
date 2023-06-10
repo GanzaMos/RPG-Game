@@ -11,23 +11,29 @@ namespace RPG.Stats
     public class BaseStats : MonoBehaviour, ISaveable
     {
         //Serializable
-        [Range(1, 99)] [SerializeField] int currentLevel = 1;
-        public int CurrentLevel => currentLevel;
-        
-        [SerializeField] CharacterClass characterClass;
         [SerializeField] Progression progression = null;
 
         //Cached
         VFXContainer _vfxContainerContainer;
+        Character _ch;
 
 
         //Start setting
-        
         void Awake()
         {
-            _vfxContainerContainer = GetComponent<VFXContainer>();
+            _ch = GetComponentInParent<Character>() ?? InstError<Character>();
+            _vfxContainerContainer = GetComponent<VFXContainer>() ?? InstError<VFXContainer>();
         }
 
+        
+        T InstError<T>()
+        {
+            string className = typeof(T).Name;
+            if (typeof(T) is Character) throw new Exception($"Missing {className} component for {name}, ID {GetInstanceID()}");
+            else throw new Exception($"Missing {className} component for {name} in {_ch?.gameObject.name}, ID {GetInstanceID()}");
+        }
+        
+        
         void Start()
         {
             SendDisplayEvent();
@@ -36,12 +42,12 @@ namespace RPG.Stats
 
         
         //Main work methods
-        
         public float GetStat(Stat stat)
         {
-            return progression.GetStat(characterClass, currentLevel, stat);
+            return progression.GetStat(_ch.data.exp.CharacterClass, _ch.data.exp.CurrentLevel, stat);
         }
 
+        
         public float GetAdditiveModifier(Stat stat)
         {
             float total = 0;
@@ -57,6 +63,7 @@ namespace RPG.Stats
             return total;
         }
 
+        
         public void LevelUpCheck(float currentExp)
         {
             float nextLevelExp;
@@ -64,41 +71,39 @@ namespace RPG.Stats
             do
             {
                 //Check if the next level Exp even exist in Dictionary. It's not? Break the cycle!
-                nextLevelExp = progression.GetStat(characterClass, currentLevel + 1, Stat.ExperienceToLevelUp);
-                {
-                    if (nextLevelExp == 0)
-                    {
-                        //print("Next level doesn't exist, you reached the maximum!");
-                        return;
-                    }
-                }
+                nextLevelExp = progression.GetStat(
+                    _ch.data.exp.CharacterClass, 
+                    _ch.data.exp.CurrentLevel + 1, 
+                    Stat.ExperienceToLevelUp);
+
+                if (nextLevelExp == 0)
+                    return;
                 
                 //Existing? Good, are we >= than it? Yes? Give the character a +1 level!
                 if (currentExp >= nextLevelExp) 
                 {
-                    currentLevel += 1;
+                    _ch.data.exp.CurrentLevel += 1;
                     SendDisplayEvent();
                     UpdateAllComponents();
                     LevelUpEffects();
                 }
                 
                 //Ok, now let's check, maybe we've got so many Exp, so we need to level up one more time
-                nextLevelExp = progression.GetStat(characterClass, currentLevel + 1, Stat.ExperienceToLevelUp);
+                nextLevelExp = progression.GetStat(
+                    _ch.data.exp.CharacterClass, 
+                    _ch.data.exp.CurrentLevel + 1, 
+                    Stat.ExperienceToLevelUp);
                 
                 //Double check if the next level even exist. No? Break the cycle!
                 if (nextLevelExp == 0)
-                {
-                    //print("We gave you next level, but that's all, it's maximum!");
                     return;
-                }
-                
+
                 //Next level exist? Are we still have Exp to reach it? Let's go to another level up!
             } while (currentExp >= nextLevelExp);
         }
 
         
         //Private methods
-        
         void UpdateAllComponents()
         {
             foreach (var component in GetComponents<ILevelUpdate>())
@@ -106,6 +111,7 @@ namespace RPG.Stats
                 component.SetNewLevelChanges();
             }
         }
+        
         
         void UpdateAllComponentsOnStart()
         {
@@ -115,32 +121,31 @@ namespace RPG.Stats
             }
         }
         
+        
         void LevelUpEffects()
         {
-            print($"Level Up! Your current level is {currentLevel}!");
+            print($"Level Up! Your current level is {_ch.data.exp.CurrentLevel}!");
             Instantiate(_vfxContainerContainer.levelUpVFX, transform.position, Quaternion.Euler(-90f, 0f, 0f), transform);
         }
 
         
         //Updating UI methods
-        
         void SendDisplayEvent()
         {
             if (gameObject.tag != "Player") return;
-            EventBus.OnLevelUpdated.Invoke(currentLevel);
+            EventBusUI.OnLevelUpdated.Invoke(_ch.data.exp.CurrentLevel);
         }
 
 
         //Saving system
-        
         public object CaptureState()
         {
-            return currentLevel;
+            return _ch.data.exp.CurrentLevel;
         }
 
         public void RestoreState(object state)
         {
-            currentLevel = (int)state;
+            _ch.data.exp.CurrentLevel = (int)state;
         }
     }
 }
